@@ -218,6 +218,11 @@ a:focus {
 	padding-bottom: 6rem;
 }
 
+.tm-section-donate {
+	padding-top: 0rem;
+	padding-bottom: 6rem;
+}
+
 .tm-blue-bg-row { background-color: #EBF5FB; }
 
 .tm-section-title {
