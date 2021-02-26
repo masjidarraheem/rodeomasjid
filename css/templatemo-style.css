@@ -18,6 +18,50 @@ a:focus {
 	outline: none;
 }
 
+
+@import url("https://fonts.googleapis.com/css?family=Fjalla+One&display=swap");
+
+.goal-cont {
+	background-color: #e02a2a;
+	color: #fff;
+	display: flex;
+	filter: drop-shadow(8px 5px 0 #3f3f3f);
+	flex-direction: row;
+	font-family: "Fjalla One", sans-serif;
+	justify-content: space-between;
+	margin: 0 32px;
+	padding: 6px 16px;
+	position: relative;
+	transform: skew(-45deg);
+
+	&__progress {
+		background-color: #228B22;
+		height: 100%;
+		left: 0;
+		position: absolute;
+		top: 0;
+		transition: width 0.3s ease-out;
+	}
+
+	&__title,
+	&__bar {
+		position: relative;
+		transform: skew(45deg);
+		z-index: 100;
+	}
+	
+	&__percent,
+	&__bar {
+		position: relative;
+		transform: skew(45deg);
+		z-index: 100;
+	}
+}
+
+
+
+
+
 /* 1. Intro 
 --------------------*/
 .tm-section-intro {
