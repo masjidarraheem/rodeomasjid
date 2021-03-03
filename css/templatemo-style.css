@@ -65,7 +65,7 @@ a:focus {
 /* 1. Intro 
 --------------------*/
 .tm-section-intro {
-	background-image: url(../img/ocean-bg.jpg);
+	background-image: url(../img/bricks.jpg);
 	background-attachment: fixed;
 	background-position: center top;
 	background-repeat: no-repeat;
@@ -82,6 +82,26 @@ a:focus {
 	        justify-content: center;
 	text-align: center;
 	height: 800px;
+}
+
+.tm-section-donation {
+  background-image: url(../img/zelle.jpg);
+  background-attachment: fixed;
+  background-position: center top;
+  background-repeat: no-repeat;
+  background-size: 100% 800px;
+  color: white;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-align-items: center;
+      -ms-flex-align: center;
+          align-items: center;
+  -webkit-justify-content: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  text-align: center;
+  height: 800px;
 }
 
 .tm-wrapper-center {
