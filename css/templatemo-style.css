@@ -253,6 +253,23 @@ a:focus {
     width: 100%;
 }
 
+.tm-paypal-btn {
+  background-color: #fcba03;
+    border: 2px solid #fcba03;
+    border-radius: 2.5rem;
+    color: #003087;
+    display: inline-block;
+    font-size: 1.5rem;
+    font-weight: 400;
+    padding: 0.8rem 3.5rem;
+}
+
+.tm-paypal-btn:hover,
+.tm-paypal-btn:focus {
+  color: white;
+  background-color: #003087;
+}
+
 .tm-bordered-btn {
 	background-color: transparent;
     border: 2px solid #81b4eb;
