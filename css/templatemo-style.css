@@ -131,6 +131,13 @@ a:focus {
     margin-bottom: 3.5rem;
 }
 
+.tm-section-intro-title {
+  font-size: 2rem;
+  margin-bottom: 4rem;
+  width: 100%;
+  letter-spacing: .6rem;
+}
+
 .tm-section-intro-text {
 	font-size: 2rem;
 	margin-bottom: 4rem;
@@ -450,7 +457,7 @@ hr { width: 65%; }
 
 @media (max-width: 480px) {
 	.tm-section-intro-title {
-	    font-size: 3.5rem;
+	    font-size: 1.8rem;
 	    margin-bottom: 1.5rem;
 	}
 
