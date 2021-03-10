@@ -457,7 +457,7 @@ hr { width: 65%; }
 
 @media (max-width: 480px) {
 	.tm-section-intro-title {
-	    font-size: 1.8rem;
+	    font-size: 1.5rem;
 	    margin-bottom: 1.5rem;
 	}
 
