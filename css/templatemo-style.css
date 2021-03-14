@@ -531,6 +531,22 @@ hr { width: 65%; }
 		font-size: 1.6rem;
 		padding: 0.5rem 1.5rem;
 	}
+
+  .tm-btn-donate {
+    font-size: 1.6rem;
+    padding: 0.5rem 1.5rem;
+  }
+
+  .tm-btn-zoom {
+    font-size: 1.6rem;
+    padding: 0.5rem 1.5rem;
+  }
+
+  .tm-btn-pledge {
+    font-size: 1.6rem;
+    padding: 0.5rem 1.5rem;
+  }
+
 }
 
 /* 2. Carousel
