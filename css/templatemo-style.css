@@ -260,6 +260,22 @@ a:focus {
     width: 100%;
 }
 
+.tm-live-btn {
+  background-color: #2D8CFF;
+    border: 2px solid #ffffff;
+    border-radius: 2.5rem;
+    color: #ffffff;
+    display: inline-block;
+    font-size: 1.5rem;
+    font-weight: 400;
+    padding: 0.8rem 3.5rem;
+}
+
+.tm-live-btn:hover,
+.tm-live-btn:focus {
+  color: white;
+  background-color: #F26D21;
+}
 
 .tm-lg-btn {
   background-color: #57c282;
