@@ -150,6 +150,7 @@ a:focus {
     background-color: #2D8CFF;
     padding: 0.1rem 1rem;
     border-radius: 0.5rem;
+    width: 300px
 }
 
 .tm-btn-zoom:hover,
@@ -164,6 +165,7 @@ a:focus {
     background-color: white;
     padding: 0.1rem 1rem;
     border-radius: 0.5rem;
+    width: 300px
 }
 
 .tm-btn-donate:hover,
@@ -178,6 +180,7 @@ a:focus {
     background-color: #63AB62;
     padding: 0.1rem 1rem;
     border-radius: 0.5rem;
+    width: 300px
 }
 
 .tm-btn-pledge:hover,
@@ -532,16 +535,19 @@ hr { width: 65%; }
   .tm-btn-donate {
     font-size: 1.6rem;
     padding: 0.5rem 1.5rem;
+    width: 200px
   }
 
   .tm-btn-zoom {
     font-size: 1.6rem;
     padding: 0.5rem 1.5rem;
+    width: 200px
   }
 
   .tm-btn-pledge {
     font-size: 1.6rem;
     padding: 0.5rem 1.5rem;
+    width: 200px
   }
 
 }
