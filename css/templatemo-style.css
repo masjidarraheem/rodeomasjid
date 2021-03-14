@@ -144,6 +144,51 @@ a:focus {
 	width: 100%;
 }
 
+.tm-btn-zoom {
+    font-size: 2.4rem;
+    color: white;
+    background-color: #2D8CFF;
+    padding: 0.75rem 2.5rem;
+    border-radius: 0.5rem;
+    width: 300px;
+}
+
+.tm-btn-zoom:hover,
+.tm-btn-zoom:focus {
+  color: white;
+    background-color: #F26D21;
+}
+
+.tm-btn-donate {
+    font-size: 2.4rem;
+    color: #2D8CFF;
+    background-color: white;
+    padding: 0.75rem 2.5rem;
+    border-radius: 0.5rem;
+    width: 300px;
+}
+
+.tm-btn-donate:hover,
+.tm-btn-donate:focus {
+  color: white;
+    background-color: #A2D1FF;
+}
+
+.tm-btn-pledge {
+    font-size: 2.4rem;
+    color: white;
+    background-color: #63AB62;
+    padding: 0.75rem 2.5rem;
+    border-radius: 0.5rem;
+    width: 300px;
+}
+
+.tm-btn-pledge:hover,
+.tm-btn-pledge:focus {
+  color: #2F4F2F;
+    background-color: #C5E3BF;
+}
+
 .tm-btn-white-big {
     font-size: 2.4rem;
     color: #a1c7f1;
