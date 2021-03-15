@@ -40,7 +40,8 @@
           <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
           <![endif]-->
 </head>
-
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.6.0/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.6.0/ScrollTrigger.min.js"></script>
     <body>
 
         <div class="container-fluid">
@@ -78,21 +79,23 @@ progress-bar-info
 
             <div class="row">
 
-                <section class="tm-wrapper-center">
-                
-   <div class="slider">
-     <div class="original-image"></div>
-     <input type="range" value="20" max="100">
-   </div>
-
-   <script>
-     document.querySelector(".slider input").addEventListener("input", function(){
-      document.querySelector(".original-image").style.width = this.value + "%";
-     });
-   </script>
 
 
-                </section>
+
+<h1 class="header-section">Scroll to see the before/after</h1>
+
+<section class="comparisonSection">
+  <div class="comparisonImage beforeImage">
+    <img src="https://assets.codepen.io/16327/before.jpg" alt="before">
+  </div>
+  <div class="comparisonImage afterImage">
+    <img src="https://assets.codepen.io/16327/after.jpg" alt="after">
+  </div>
+</section>
+
+<h1 class="header-section">What did you think?</h1>
+              
+ 
 
             </div> <!-- row -->
 
@@ -384,6 +387,7 @@ progress-bar-info
 
         <!-- load JS files -->
         <script src="js/jquery-1.11.3.min.js"></script>             <!-- jQuery, https://jquery.com/download/ -->
+        <script src="scroll.js"></script>
         <script src="https://www.atlasestateagents.co.uk/javascript/tether.min.js"></script> <!-- Tether for Bootstrap, http://stackoverflow.com/questions/34567939/how-to-fix-the-error-error-bootstrap-tooltips-require-tether-http-github-h -->
         <script src="js/bootstrap.min.js"></script>                 <!-- Bootstrap, http://v4-alpha.getbootstrap.com/ -->
         <script src="js/jquery.touchSwipe.min.js"></script>         <!-- http://labs.rampinteractive.co.uk/touchSwipe/demos/ -->
