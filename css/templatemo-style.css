@@ -9,6 +9,7 @@ body {
 	font-family: 'Open Sans', Helvetica, Arial, sans-serif;
 	font-size: 19px;
 	font-weight: 300;
+  overflow-x: hidden;
 }
 a { color: #81b4eb;  }
 a, button { transition: all 0.3s ease; }
@@ -506,6 +507,9 @@ hr { width: 65%; }
 }
 
 @media (max-width: 1900px) {
+  body {
+      overflow-x: hidden;
+  }
 	.tm-section-intro {	background-size: 1900px 800px; }
 }
 
@@ -517,6 +521,10 @@ hr { width: 65%; }
 }
 
 @media (max-width: 480px) {
+
+  body {
+      overflow-x: hidden;
+  }
 	.tm-section-intro-title {
 	    font-size: 1.5rem;
 	    margin-bottom: 1.5rem;
@@ -556,6 +564,11 @@ hr { width: 65%; }
 /* 2. Carousel
 ----------------------*/
 @media (max-width: 767px) {
+
+  body {
+      overflow-x: hidden;
+  }
+
 	.tm-carousel {
 		margin-top: 10%;
 		margin-bottom: 10%;
@@ -577,6 +590,9 @@ hr { width: 65%; }
 /* 3. Image and text 2 column block
 ----------------------------------------*/
 @media (max-width: 1600px) {
+  body {
+      overflow-x: hidden;
+  }
 	.tm-2-col-text {
 		padding-left: 5%;
 		padding-right: 5%;
@@ -602,6 +618,9 @@ hr { width: 65%; }
 }
 
 @media (max-width: 991px) {
+  body {
+      overflow-x: hidden;
+  }
 	.tm-2-col-img-text { display: block; }
 
 	.tm-2-col-img img {	margin: 0 auto;	}
@@ -628,6 +647,9 @@ hr { width: 65%; }
 }
 
 @media (max-width: 480px) {
+  body {
+      overflow-x: hidden;
+  }
 	.tm-2-col-text { padding: 10%; }	
 }
 
@@ -635,6 +657,9 @@ hr { width: 65%; }
 /* 4. icon and text 4 boxes
 ----------------------------*/
 @media (max-width: 1199px) {
+  body {
+      overflow-x: hidden;
+  }
 	.tm-icon-text-box {	margin: 0 auto 30px; }
 }
 
@@ -664,6 +689,9 @@ hr { width: 65%; }
 /* 5. contact 
 --------------*/
 @media (max-width: 1199px) {
+  body {
+      overflow-x: hidden;
+  }
 	.tm-form-group-right { padding-left: 0;	}	
 }
 
