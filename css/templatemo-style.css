@@ -520,6 +520,7 @@ hr { width: 65%; }
 	.tm-section-intro-title {
 	    font-size: 1.5rem;
 	    margin-bottom: 1.5rem;
+      margin-top: -3rem;
 	}
 
 	.tm-section-intro-text {
