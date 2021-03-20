@@ -191,8 +191,8 @@ a:focus {
 
 .tm-btn-event:hover,
 .tm-btn-event:focus {
-  color: #2F4F2F;
-    background-color: #C5E3BF;
+  color: #ffffff;
+    background-color: #f94d00;
 }
 
 .tm-btn-pledge {
