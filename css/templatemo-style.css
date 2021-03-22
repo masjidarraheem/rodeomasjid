@@ -534,6 +534,12 @@ hr { width: 65%; }
 		margin-bottom: 2rem;
 	}
 
+  .tm-section-intro-text2 {
+    font-size: 1.5rem;
+    margin-bottom: 2rem;
+    padding-top: 0rem;
+  }
+
 	.tm-btn-white-big {
 		font-size: 1.6rem;
 		padding: 0.5rem 1.5rem;
