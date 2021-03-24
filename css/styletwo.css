@@ -101,11 +101,11 @@
 
 .timeline-item:nth-child(1) .timeline-img-header {
 
-  background: linear-gradient(transparent, rgba(0, 0, 0, 0.4)), url("../img/lot.jpg") center center no-repeat;
+  background: linear-gradient(transparent, rgba(0, 0, 0, 0.4)), url("") center center no-repeat;
   background-size: cover;
 }
 .timeline-item:nth-child(4) .timeline-img-header {
-  background: linear-gradient(transparent, rgba(0, 0, 0, 0.4)), url("../img/future-school.png") center center no-repeat;
+  background: linear-gradient(transparent, rgba(0, 0, 0, 0.4)), url("") center center no-repeat;
   background-size: cover;
 }
 .timeline-item:nth-child(3) .timeline-img-header {
@@ -113,7 +113,7 @@
   background-size: cover;
 }
 .timeline-item:nth-child(5) .timeline-img-header {
-  background: linear-gradient(transparent, rgba(0, 0, 0, 0.4)), url("../img/after.png") center center no-repeat;
+  background: linear-gradient(transparent, rgba(0, 0, 0, 0.4)), url("") center center no-repeat;
   background-size: cover;
 }
 .timeline-item:nth-child(6) .timeline-img-header {
