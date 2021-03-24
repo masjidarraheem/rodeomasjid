@@ -10,39 +10,6 @@ section {
   padding: 100px 0;
 }
 
-html, body {
-  overflow-x: hidden;
-}
-
-body {
-  font-family: 'Roboto';
-  font-size: 17px;
-  font-weight: 400;
-  background-color: #eee;
-}
-
-h1 {
-  font-size: 200%;
-  text-transform: uppercase;
-  letter-spacing: 3px;
-  font-weight: 400;
-}
-
-header {
-	background: $primary;
-	color: $text;
-	padding: 150px 0;
-
-	p {
-		font-family: 'Allura';
-		color: rgba(255, 255, 255, .2);
-		margin-bottom: 0;
-		font-size: 60px;
-		margin-top: -30px;
-
-	}
-}
-
 .timeline {
 
 	position: relative;
