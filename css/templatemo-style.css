@@ -672,6 +672,12 @@ hr { width: 65%; }
 		padding-top: 10%;
     	padding-bottom: 8%;
 	}
+
+@media (max-width: 767px) {
+  .tm-section-header {
+    padding-top: 0%;
+      padding-bottom: 0%;
+  }
 }
 
 /* 5. contact 
