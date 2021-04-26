@@ -392,6 +392,11 @@ a:focus {
 	padding-bottom: 6rem;
 }
 
+.tm-section-timeline {
+  padding-top: 3rem;
+  padding-bottom: 0rem;
+}
+
 .tm-section-donate {
 	padding-top: 0rem;
 	padding-bottom: 6rem;
