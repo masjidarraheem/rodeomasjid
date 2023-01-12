@@ -363,6 +363,23 @@ a:focus {
   background-color: #003087;
 }
 
+.tm-comm-btn {
+  background-color: #003087;
+    border: 2px solid #003087;
+    border-radius: 2.5rem;
+    color: #ffffff;
+    display: inline-block;
+    font-size: 1rem;
+    font-weight: 400;
+    padding: 0.8rem 3.5rem;
+}
+
+.tm-comm-btn:hover,
+.tm-comm-btn:focus {
+  color: white;
+  background-color: #003087;
+}
+
 .tm-bordered-btn {
 	background-color: transparent;
     border: 2px solid #81b4eb;
