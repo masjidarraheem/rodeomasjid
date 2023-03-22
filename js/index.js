@@ -49,3 +49,7 @@ $(function(){
 
 
 });
+
+$('.announcement__close').click(function(){
+  $(".announcement, .content").removeClass("open");
+});

@@ -6,6 +6,64 @@ $primary-text: #212121;
 $secondary-text: #757575;
 $accent: #FF4081;
 
+.content {
+  position: relative;
+  top: -327px;
+  transition: .2s;
+}
+
+.open {
+  top: 0;
+}
+
+.wrapper {
+  max-width: 1160px;
+  padding: 40px 20px;
+  margin: 0 auto;
+}
+
+.masonry {
+  padding: 0;
+  -moz-column-gap: 20px;
+  -webkit-column-gap: 20px;
+  column-gap: 20px;
+  font-size: 14px;
+}
+
+.item {
+  display: inline-block;
+  background: #fff;
+  padding: 14px 20px;
+  margin: 0 0 1.5em;
+  width: 100%;
+  box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  box-shadow: 0px 1px 1px 0px rgba(0, 0, 0, 0.15);
+  p {
+    margin: 0 0 8px;
+    font-weight: 600;
+  }
+  ul {
+    padding: 0;
+    margin: 0;
+  }
+  li {
+    list-style: none;
+    padding: 8px 0;
+    
+  }
+  a {
+    color: #1B9DEE;
+    text-decoration: none;
+    transition: .125s;
+    
+    &:hover {
+      color: darken(#1B9DEE, 20%)
+    }
+  }
+}
+
 section {
   padding: 100px 0;
 }
