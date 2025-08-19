@@ -119,7 +119,22 @@ _divIframe.innerHTML = '<iframe src="' + srcURL + '" name="' + Date.now() + '" f
                                         <h2 class="tm-section-title">Classes</h2>
                                         <b class="tm-icon-text-box-description tm-wrapper-center">Maktab 2023/2024</b></p>
 <p> Enroll your child to Masjid Ar-Raheem's Maktab class by clicking the button below.</p>
-<button data-tf-popup="egjCHfSy" data-tf-opacity="100" data-tf-size="100" data-tf-iframe-props="title=2023-2024 Masjid Ar-Raheem Maktab Enrollment" data-tf-transitive-search-params data-tf-medium="snippet" style="all:unset;font-family:Helvetica,Arial,sans-serif;display:inline-block;max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;background-color:#0445AF;color:#fff;font-size:20px;border-radius:25px;padding:0 33px;font-weight:bold;height:50px;cursor:pointer;line-height:50px;text-align:center;margin:0;text-decoration:none;">Register Now</button><script src="//embed.typeform.com/next/embed.js"></script>
+<button id="typebot-trigger" style="all:unset;font-family:Helvetica,Arial,sans-serif;display:inline-block;max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;background-color:#0445AF;color:#fff;font-size:20px;border-radius:25px;padding:0 33px;font-weight:bold;height:50px;cursor:pointer;line-height:50px;text-align:center;margin:0;text-decoration:none;">Register Now</button>
+
+<script type="module">
+  import Typebot from 'https://cdn.jsdelivr.net/npm/@typebot.io/js@0/dist/web.js'
+  
+  // Initialize Typebot
+  Typebot.initPopup({
+    typebot: "maktab",
+    apiHost: "https://bot.rodeomasjid.org",
+  });
+  
+  // Add click event to your button
+  document.getElementById('typebot-trigger').addEventListener('click', () => {
+    Typebot.open();
+  });
+</script>
 </br><p> Enrollment form closed? Join the waitlist and we will enroll as space become available.</p>
 <button data-tf-popup="eloRxhhl" data-tf-opacity="100" data-tf-size="100" data-tf-iframe-props="title=2023-2024 Maktab Waitlist" data-tf-transitive-search-params data-tf-medium="snippet" style="all:unset;font-family:Helvetica,Arial,sans-serif;display:inline-block;max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;background-color:#0445AF;color:#fff;font-size:20px;border-radius:25px;padding:0 33px;font-weight:bold;height:50px;cursor:pointer;line-height:50px;text-align:center;margin:0;text-decoration:none;">Get On Waitlist</button><script src="//embed.typeform.com/next/embed.js"></script>
                                     </div>
