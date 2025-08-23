@@ -46,15 +46,41 @@ document.addEventListener('DOMContentLoaded', function() {
             const targetId = this.getAttribute('href');
             const target = document.querySelector(targetId);
             
-            if (target) {
-                // Special handling for programs which is a card within a section
-                let offsetTop = target.offsetTop - 80;
+            // Remove active class from all nav links
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.classList.remove('active');
+                link.classList.remove('clicked');
+            });
+            
+            // Add active class to clicked link
+            if (this.classList.contains('nav-link')) {
+                this.classList.add('active');
+                this.classList.add('clicked');
                 
-                // If target is within a section (like programs card), get the card's position
-                if (target.classList.contains('info-card')) {
+                // Store which link was clicked
+                window.lastClickedNav = targetId;
+                
+                // Keep the clicked state for longer
+                setTimeout(() => {
+                    this.classList.remove('clicked');
+                    window.lastClickedNav = null;
+                }, 1500);
+            }
+            
+            if (target) {
+                let offsetTop;
+                
+                // Calculate scroll position based on target
+                if (targetId === '#home') {
+                    offsetTop = 0;
+                } else if (targetId === '#prayer-times') {
+                    offsetTop = target.offsetTop - 80;
+                } else if (targetId === '#programs') {
                     const rect = target.getBoundingClientRect();
                     const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
                     offsetTop = rect.top + scrollTop - 100;
+                } else {
+                    offsetTop = target.offsetTop - 80;
                 }
                 
                 window.scrollTo({
@@ -131,28 +157,65 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     
     // Active navigation highlighting
-    const sections = document.querySelectorAll('section[id]');
-    
     function highlightNavigation() {
+        // Don't update during click animation
+        if (window.lastClickedNav) {
+            return;
+        }
+        
         const scrollY = window.pageYOffset;
         
-        sections.forEach(section => {
-            const sectionHeight = section.offsetHeight;
-            const sectionTop = section.offsetTop - 100;
-            const sectionId = section.getAttribute('id');
-            const navLink = document.querySelector(`.nav-link[href="#${sectionId}"]`);
-            
-            if (navLink) {
-                if (scrollY > sectionTop && scrollY <= sectionTop + sectionHeight) {
-                    navLink.classList.add('active');
-                } else {
-                    navLink.classList.remove('active');
-                }
+        // Remove all active classes first
+        document.querySelectorAll('.nav-link').forEach(link => {
+            if (!link.classList.contains('clicked')) {
+                link.classList.remove('active');
             }
         });
+        
+        // Check each section to find which one we're in
+        let activeSection = null;
+        
+        // Special case for home at top
+        if (scrollY < 200) {
+            activeSection = 'home';
+        } else {
+            // Check all sections
+            const sections = ['contact', 'donate', 'updates', 'about', 'programs', 'prayer-times', 'home'];
+            
+            for (const sectionId of sections) {
+                const element = document.getElementById(sectionId);
+                if (element) {
+                    const rect = element.getBoundingClientRect();
+                    const top = rect.top;
+                    
+                    // Check if this section is in view (top third of viewport)
+                    if (top <= 150 && top > -rect.height + 150) {
+                        activeSection = sectionId;
+                        break;
+                    }
+                }
+            }
+        }
+        
+        // If we found an active section, highlight it
+        if (activeSection) {
+            const activeLink = document.querySelector(`.nav-link[href="#${activeSection}"]`);
+            if (activeLink && !activeLink.classList.contains('clicked')) {
+                activeLink.classList.add('active');
+            }
+        }
     }
     
-    window.addEventListener('scroll', highlightNavigation);
+    // Simplified scroll listener
+    let scrollTimer;
+    window.addEventListener('scroll', () => {
+        clearTimeout(scrollTimer);
+        scrollTimer = setTimeout(() => {
+            highlightNavigation();
+        }, 50);
+    });
+    
+    highlightNavigation(); // Call once on load
     
     // Form validation
     const emailForm = document.getElementById('mc-embedded-subscribe-form');
@@ -271,7 +334,8 @@ document.addEventListener('DOMContentLoaded', function() {
         };
     }
     
-    window.addEventListener('scroll', debounceScroll(highlightNavigation));
+    // Use debounced version for scroll event
+    window.addEventListener('scroll', debounceScroll(highlightNavigation, 10));
     
     // Preload critical images
     const criticalImages = [

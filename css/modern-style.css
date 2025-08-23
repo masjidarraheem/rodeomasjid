@@ -226,6 +226,17 @@ a:hover {
     padding: 20px;
 }
 
+.hero-logo {
+    margin-bottom: 30px;
+}
+
+.hero-logo-img {
+    max-width: 300px;
+    width: 100%;
+    height: auto;
+    filter: drop-shadow(0 4px 6px rgba(0,0,0,0.3));
+}
+
 .hero-title {
     margin-bottom: 20px;
     display: flex;
@@ -751,6 +762,12 @@ a:hover {
     align-items: center;
 }
 
+.donation-action form {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+
 .btn-donate {
     width: 220px;
     padding: 12px 20px;
@@ -759,6 +776,9 @@ a:hover {
     align-items: center;
     justify-content: center;
     gap: 8px;
+    border: none;
+    cursor: pointer;
+    font-family: inherit;
 }
 
 .info-display-box {
@@ -1049,6 +1069,10 @@ a:hover {
     }
     
     /* Hero Mobile */
+    .hero-logo-img {
+        max-width: 200px;
+    }
+    
     .hero-title .arabic-text {
         font-size: 2rem;
     }
@@ -1086,6 +1110,11 @@ a:hover {
     }
     
     .btn-donate {
+        width: 100%;
+        max-width: none;
+    }
+    
+    .donation-action form {
         width: 100%;
     }
     
