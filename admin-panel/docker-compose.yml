@@ -5,7 +5,7 @@ services:
     build: .
     container_name: masjid-admin-panel
     ports:
-      - "80:80"
+      - "87:80"
     environment:
       - NODE_ENV=production
     restart: unless-stopped
