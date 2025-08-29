@@ -7,20 +7,18 @@ RUN apk add --no-cache bash
 # Remove default nginx website
 RUN rm -rf /usr/share/nginx/html/*
 
-# Copy specific admin panel files (env.js will be generated at runtime)
-COPY index.html /usr/share/nginx/html/
-COPY admin.js /usr/share/nginx/html/
-COPY firebase-config.js /usr/share/nginx/html/
+# Copy all files except those in .dockerignore
+COPY . /usr/share/nginx/html/
+
+# Move entrypoint to root and make executable
+RUN mv /usr/share/nginx/html/entrypoint.sh /entrypoint.sh && \
+    chmod +x /entrypoint.sh
 
 # Copy custom nginx configuration
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 
-# Copy entrypoint script to root
-COPY entrypoint.sh /entrypoint.sh
-RUN chmod +x /entrypoint.sh
-
 # Expose port 80
 EXPOSE 80
 
-# Start with environment variable injection
+# Start with environment variable injection  
 CMD ["/entrypoint.sh"]
