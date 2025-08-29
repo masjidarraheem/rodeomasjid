@@ -1,4 +1,4 @@
-import { db } from './firebase-config.js';
+import { db, auth } from './firebase-config.js';
 import { 
     collection, 
     addDoc, 
@@ -9,15 +9,81 @@ import {
     query,
     orderBy
 } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+import {
+    signInWithEmailAndPassword,
+    signOut,
+    onAuthStateChanged
+} from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
 
 class ProgramsAdmin {
     constructor() {
         this.editingId = null;
         this.selectedIcon = null;
+        this.currentUser = null;
         this.init();
     }
 
     init() {
+        this.setupAuth();
+        this.setupLoginForm();
+        this.setupLogout();
+    }
+
+    setupAuth() {
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                // User is signed in
+                this.currentUser = user;
+                this.showAdminPanel();
+                document.getElementById('userEmail').textContent = user.email;
+            } else {
+                // User is signed out
+                this.currentUser = null;
+                this.showLoginForm();
+            }
+        });
+    }
+
+    setupLoginForm() {
+        const loginForm = document.getElementById('loginForm');
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const errorDiv = document.getElementById('loginError');
+            
+            try {
+                await signInWithEmailAndPassword(auth, email, password);
+                errorDiv.style.display = 'none';
+            } catch (error) {
+                errorDiv.textContent = `Login failed: ${error.message}`;
+                errorDiv.style.display = 'block';
+            }
+        });
+    }
+
+    setupLogout() {
+        const logoutBtn = document.getElementById('logoutBtn');
+        logoutBtn.addEventListener('click', async () => {
+            try {
+                await signOut(auth);
+            } catch (error) {
+                console.error('Logout error:', error);
+            }
+        });
+    }
+
+    showLoginForm() {
+        document.getElementById('loginContainer').style.display = 'block';
+        document.getElementById('adminContainer').style.display = 'none';
+    }
+
+    showAdminPanel() {
+        document.getElementById('loginContainer').style.display = 'none';
+        document.getElementById('adminContainer').style.display = 'block';
+        
+        // Initialize admin functionality only when authenticated
         this.setupIconSelector();
         this.setupForm();
         this.loadPrograms();
