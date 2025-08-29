@@ -32,9 +32,9 @@ jobs:
       run: |
         ls -la
         if [ -f "build.sh" ]; then
-          echo "build.sh found"
+          echo "build.sh found, running with bash"
           chmod +x build.sh
-          ./build.sh
+          bash build.sh
         else
           echo "build.sh not found, generating env.js with defaults"
           cat > js/env.js << EOF
