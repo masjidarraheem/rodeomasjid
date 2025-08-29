@@ -128,26 +128,13 @@
                     <h3>Current Programs</h3>
                     <div class="programs-content">
                         <ul class="programs-list">
+                            <!-- Programs loaded dynamically from Firebase -->
                             <li class="program-item">
                                 <div class="program-time">
-                                    <i class="fas fa-sun"></i>
-                                    <span>Daily after Maghrib</span>
+                                    <i class="fas fa-spinner fa-spin"></i>
+                                    <span>Loading programs...</span>
                                 </div>
-                                <div class="program-name">Riyad Us-Saliheen</div>
-                            </li>
-                            <li class="program-item">
-                                <div class="program-time">
-                                    <i class="fas fa-calendar-week"></i>
-                                    <span>Thursdays after Maghrib</span>
-                                </div>
-                                <div class="program-name">Contemplating the Day of Judgment</div>
-                            </li>
-                            <li class="program-item">
-                                <div class="program-time">
-                                    <i class="fas fa-users"></i>
-                                    <span>3rd Saturday Monthly</span>
-                                </div>
-                                <div class="program-name">Family Night</div>
+                                <div class="program-name"></div>
                             </li>
                         </ul>
                     </div>
@@ -449,8 +436,14 @@
     <!-- Typeform Script -->
     <script src="//embed.typeform.com/next/embed.js"></script>
     
+    <!-- Environment variables (generated at build time) -->
+    <script src="js/env.js"></script>
+    
     <!-- Modern JavaScript -->
     <script src="js/modern-app.js"></script>
+    
+    <!-- Dynamic Programs -->
+    <script src="js/programs.js"></script>
     
     <!-- Google Analytics -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-W77ZKV2WLL"></script>
