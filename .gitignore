@@ -4,8 +4,6 @@
 .env.production
 
 # Firebase config files (keep placeholder versions)
-js/env.js
-admin-panel/env.js
 
 # Node modules (if using npm)
 node_modules/
