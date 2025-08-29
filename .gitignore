@@ -3,6 +3,9 @@
 .env.local
 .env.production
 
+# Generated environment files
+js/env.js
+
 # Firebase config files (keep placeholder versions)
 
 # Node modules (if using npm)
