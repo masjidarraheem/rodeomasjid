@@ -7,11 +7,10 @@ RUN apk add --no-cache bash
 # Remove default nginx website
 RUN rm -rf /usr/share/nginx/html/*
 
-# Copy specific admin panel files
+# Copy specific admin panel files (env.js will be generated at runtime)
 COPY index.html /usr/share/nginx/html/
 COPY admin.js /usr/share/nginx/html/
 COPY firebase-config.js /usr/share/nginx/html/
-COPY env.js /usr/share/nginx/html/
 
 # Copy custom nginx configuration
 COPY nginx.conf /etc/nginx/conf.d/default.conf
