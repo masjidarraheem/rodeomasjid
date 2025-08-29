@@ -48,6 +48,17 @@ jobs:
         };
         EOF
         fi
+        
+        # Verify env.js was created
+        echo "Verifying js/env.js exists:"
+        if [ -f "js/env.js" ]; then
+          echo "✅ js/env.js created successfully"
+          echo "File contents (first 5 lines):"
+          head -5 js/env.js
+        else
+          echo "❌ ERROR: js/env.js was not created!"
+          exit 1
+        fi
     
     - name: Setup Pages
       uses: actions/configure-pages@v4
