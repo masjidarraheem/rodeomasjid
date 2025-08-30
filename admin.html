@@ -19,7 +19,7 @@
         }
 
         .container {
-            max-width: 800px;
+            max-width: 1200px;
             margin: 0 auto;
             background: white;
             border-radius: 20px;
@@ -28,34 +28,54 @@
         }
 
         .header {
-            background: #2c3e50;
+            background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
             color: white;
-            padding: 30px;
+            padding: 40px 30px;
             text-align: center;
         }
 
         .header h1 {
-            font-size: 28px;
+            font-size: 32px;
             margin-bottom: 10px;
+            font-weight: 700;
         }
 
         .header p {
             opacity: 0.9;
-            font-size: 16px;
+            font-size: 18px;
+        }
+
+        .header-user-info {
+            margin-top: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
         }
 
         .content {
-            padding: 40px;
+            padding: 30px;
+        }
+
+        @media (min-width: 768px) {
+            .content {
+                padding: 50px;
+            }
         }
 
         .form-section {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 30px;
             margin-bottom: 40px;
         }
 
         .form-section h2 {
             color: #2c3e50;
-            margin-bottom: 20px;
-            font-size: 24px;
+            margin-bottom: 25px;
+            font-size: 26px;
+            font-weight: 600;
         }
 
         .form-group {
@@ -64,132 +84,210 @@
 
         .form-group label {
             display: block;
-            margin-bottom: 8px;
+            margin-bottom: 10px;
             font-weight: 600;
-            color: #555;
+            color: #2c3e50;
+            font-size: 15px;
         }
 
         .form-group input,
-        .form-group select {
+        .form-group select,
+        .form-group textarea {
             width: 100%;
-            padding: 15px;
+            padding: 15px 18px;
             border: 2px solid #e0e0e0;
-            border-radius: 10px;
+            border-radius: 12px;
             font-size: 16px;
-            transition: border-color 0.3s ease;
+            transition: all 0.3s ease;
+            background: white;
         }
 
         .form-group input:focus,
-        .form-group select:focus {
+        .form-group select:focus,
+        .form-group textarea:focus {
             outline: none;
             border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .form-group textarea {
+            min-height: 120px;
+            resize: vertical;
+            font-family: inherit;
         }
 
         .icon-selector {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
-            gap: 10px;
-            margin-top: 10px;
+            grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
+            gap: 12px;
+            margin-top: 15px;
+            padding: 20px;
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
         }
 
         .icon-option {
-            padding: 15px;
+            padding: 18px;
             border: 2px solid #e0e0e0;
-            border-radius: 10px;
+            border-radius: 12px;
             text-align: center;
             cursor: pointer;
             transition: all 0.3s ease;
             background: white;
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .icon-option:hover {
             border-color: #667eea;
             background: #f8f9ff;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
         }
 
         .icon-option.selected {
             border-color: #667eea;
             background: #667eea;
             color: white;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
         }
 
         .icon-option i {
-            font-size: 24px;
+            font-size: 26px;
         }
 
         .btn {
-            padding: 15px 30px;
+            padding: 14px 28px;
             border: none;
-            border-radius: 10px;
+            border-radius: 12px;
             font-size: 16px;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s ease;
             margin-right: 10px;
+            margin-bottom: 10px;
+            display: inline-block;
         }
 
         .btn-primary {
-            background: #667eea;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
         }
 
         .btn-primary:hover {
-            background: #5a67d8;
             transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
         }
 
         .btn-danger {
-            background: #e53e3e;
+            background: linear-gradient(135deg, #e53e3e 0%, #c53030 100%);
             color: white;
         }
 
         .btn-danger:hover {
-            background: #c53030;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(229, 62, 62, 0.4);
+        }
+
+        @media (max-width: 480px) {
+            .btn {
+                padding: 12px 20px;
+                font-size: 14px;
+            }
         }
 
         .programs-list {
-            margin-top: 40px;
+            margin-top: 50px;
+        }
+
+        .programs-list h2 {
+            color: #2c3e50;
+            margin-bottom: 25px;
+            font-size: 26px;
+            font-weight: 600;
         }
 
         .program-item {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 20px;
-            border: 2px solid #e0e0e0;
-            border-radius: 10px;
-            margin-bottom: 15px;
-            transition: border-color 0.3s ease;
+            padding: 25px;
+            background: white;
+            border: 2px solid #e9ecef;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
         }
 
         .program-item:hover {
             border-color: #667eea;
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.1);
+            transform: translateY(-2px);
         }
 
         .program-info {
             display: flex;
             align-items: center;
-            gap: 15px;
+            gap: 20px;
+            flex: 1;
         }
 
         .program-icon {
-            font-size: 24px;
-            color: #667eea;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 12px;
+            color: white;
+            font-size: 22px;
+            flex-shrink: 0;
+        }
+
+        .program-details {
+            flex: 1;
         }
 
         .program-details h3 {
-            margin: 0 0 5px 0;
+            margin: 0 0 8px 0;
             color: #2c3e50;
+            font-size: 18px;
+            font-weight: 600;
         }
 
         .program-details p {
-            margin: 0;
-            color: #666;
+            margin: 0 0 5px 0;
+            color: #6c757d;
+            font-size: 15px;
         }
 
         .program-actions {
             display: flex;
             gap: 10px;
+            flex-shrink: 0;
+        }
+
+        @media (max-width: 768px) {
+            .program-item {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 20px;
+                padding: 20px;
+            }
+
+            .program-actions {
+                justify-content: stretch;
+            }
+
+            .program-actions .btn {
+                flex: 1;
+                margin: 0;
+            }
         }
 
         .loading {
@@ -199,58 +297,82 @@
         }
 
         .success-message {
-            background: #48bb78;
+            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
             color: white;
-            padding: 15px;
-            border-radius: 10px;
-            margin-bottom: 20px;
+            padding: 18px 20px;
+            border-radius: 12px;
+            margin-bottom: 25px;
             display: none;
+            font-size: 15px;
+            box-shadow: 0 4px 15px rgba(72, 187, 120, 0.3);
+            animation: slideDown 0.3s ease;
         }
 
         .error-message {
-            background: #e53e3e;
+            background: linear-gradient(135deg, #e53e3e 0%, #c53030 100%);
             color: white;
-            padding: 15px;
-            border-radius: 10px;
-            margin-bottom: 20px;
+            padding: 18px 20px;
+            border-radius: 12px;
+            margin-bottom: 25px;
             display: none;
+            font-size: 15px;
+            box-shadow: 0 4px 15px rgba(229, 62, 62, 0.3);
+            animation: slideDown 0.3s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         .tabs {
             display: flex;
-            gap: 10px;
-            margin-bottom: 30px;
-            border-bottom: 2px solid #e0e0e0;
+            gap: 15px;
+            margin-bottom: 40px;
+            background: #f8f9fa;
+            padding: 8px;
+            border-radius: 12px;
         }
 
         .tab-button {
-            padding: 12px 24px;
-            background: none;
+            flex: 1;
+            padding: 14px 28px;
+            background: transparent;
             border: none;
-            color: #666;
+            color: #6c757d;
             font-size: 16px;
             font-weight: 600;
             cursor: pointer;
-            position: relative;
-            transition: color 0.3s ease;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            white-space: nowrap;
         }
 
         .tab-button:hover {
+            background: rgba(102, 126, 234, 0.1);
             color: #667eea;
         }
 
         .tab-button.active {
+            background: white;
             color: #667eea;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         }
 
-        .tab-button.active::after {
-            content: '';
-            position: absolute;
-            bottom: -2px;
-            left: 0;
-            right: 0;
-            height: 2px;
-            background: #667eea;
+        @media (max-width: 480px) {
+            .tabs {
+                padding: 6px;
+            }
+            .tab-button {
+                padding: 12px 16px;
+                font-size: 14px;
+            }
         }
 
         .tab-content {
@@ -265,15 +387,18 @@
             display: flex;
             align-items: flex-start;
             justify-content: space-between;
-            padding: 20px;
-            border: 2px solid #e0e0e0;
-            border-radius: 10px;
-            margin-bottom: 15px;
-            transition: border-color 0.3s ease;
+            padding: 25px;
+            background: white;
+            border: 2px solid #e9ecef;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
         }
 
         .announcement-item:hover {
             border-color: #667eea;
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.1);
+            transform: translateY(-2px);
         }
 
         .announcement-info {
@@ -282,30 +407,48 @@
         }
 
         .announcement-title {
-            font-size: 18px;
+            font-size: 20px;
             font-weight: 600;
             color: #2c3e50;
-            margin-bottom: 5px;
+            margin-bottom: 10px;
         }
 
         .announcement-message {
-            color: #666;
-            margin-bottom: 10px;
-            line-height: 1.5;
+            color: #6c757d;
+            margin-bottom: 15px;
+            line-height: 1.6;
+            font-size: 15px;
         }
 
         .announcement-meta {
             display: flex;
-            gap: 15px;
+            flex-wrap: wrap;
+            gap: 12px;
             font-size: 14px;
-            color: #999;
+            color: #6c757d;
         }
 
         .announcement-priority {
-            padding: 2px 8px;
-            border-radius: 4px;
-            font-size: 12px;
+            padding: 4px 12px;
+            border-radius: 6px;
+            font-size: 13px;
             font-weight: 600;
+        }
+
+        @media (max-width: 768px) {
+            .announcement-item {
+                flex-direction: column;
+                gap: 20px;
+                padding: 20px;
+            }
+
+            .announcement-info {
+                margin-right: 0;
+            }
+
+            .program-actions {
+                width: 100%;
+            }
         }
 
         .priority-high {
@@ -324,28 +467,58 @@
         }
 
         @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+
             .container {
-                margin: 10px;
                 border-radius: 15px;
             }
             
-            .content {
+            .header {
+                padding: 30px 20px;
+            }
+
+            .header h1 {
+                font-size: 26px;
+            }
+
+            .header p {
+                font-size: 16px;
+            }
+
+            .form-section {
                 padding: 20px;
             }
 
+            .form-section h2 {
+                font-size: 22px;
+            }
+
             .icon-selector {
-                grid-template-columns: repeat(auto-fill, minmax(50px, 1fr));
+                grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
+                padding: 15px;
             }
 
-            .program-item {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 15px;
+            .programs-list h2 {
+                font-size: 22px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .header h1 {
+                font-size: 22px;
             }
 
-            .program-actions {
-                width: 100%;
-                justify-content: center;
+            .form-group label {
+                font-size: 14px;
+            }
+
+            .form-group input,
+            .form-group select,
+            .form-group textarea {
+                font-size: 15px;
+                padding: 12px 15px;
             }
         }
     </style>
@@ -379,9 +552,9 @@
         <div class="header">
             <h1>🕌 Admin Panel</h1>
             <p>Manage Masjid Ar-Raheem</p>
-            <div style="margin-top: 15px;">
-                <span id="userEmail" style="font-size: 14px; opacity: 0.8;"></span>
-                <button id="logoutBtn" class="btn" style="background: #e74c3c; color: white; margin-left: 15px; padding: 8px 16px; font-size: 14px;">Logout</button>
+            <div class="header-user-info">
+                <span id="userEmail" style="font-size: 15px; opacity: 0.9;"></span>
+                <button id="logoutBtn" class="btn" style="background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%); color: white; padding: 10px 20px; font-size: 14px; margin: 0;">Logout</button>
             </div>
         </div>
 
@@ -478,7 +651,7 @@
 
                         <div class="form-group">
                             <label for="announcementMessage">Message</label>
-                            <textarea id="announcementMessage" required placeholder="Enter your announcement message..." style="width: 100%; padding: 15px; border: 2px solid #e0e0e0; border-radius: 10px; font-size: 16px; min-height: 120px; resize: vertical; font-family: inherit;"></textarea>
+                            <textarea id="announcementMessage" required placeholder="Enter your announcement message..."></textarea>
                         </div>
 
                         <div class="form-group">
@@ -492,7 +665,7 @@
 
                         <div class="form-group">
                             <label for="announcementExpiry">Expiry Date (Optional)</label>
-                            <input type="datetime-local" id="announcementExpiry" style="width: 100%; padding: 15px; border: 2px solid #e0e0e0; border-radius: 10px; font-size: 16px;">
+                            <input type="datetime-local" id="announcementExpiry">
                         </div>
 
                         <div class="form-group">
