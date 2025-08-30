@@ -93,7 +93,7 @@ class AdminPanel {
         this.setupBoardForm();
         this.loadPrograms();
         this.loadAnnouncements();
-        this.loadBoardMembers();
+        // Don't load board members initially - wait for tab click
     }
 
     setupTabs() {
@@ -110,6 +110,11 @@ class AdminPanel {
                 
                 button.classList.add('active');
                 document.getElementById(`${targetTab}Tab`).classList.add('active');
+                
+                // Load board members when board tab is clicked
+                if (targetTab === 'board') {
+                    this.loadBoardMembers();
+                }
             });
         });
     }
@@ -984,18 +989,28 @@ class AdminPanel {
         }
         
         try {
-            const q = query(collection(db, 'boardMembers'), orderBy('order', 'asc'));
-            const querySnapshot = await getDocs(q);
+            // First try without ordering to avoid index requirement
+            const querySnapshot = await getDocs(collection(db, 'boardMembers'));
             
             if (querySnapshot.empty) {
                 boardList.innerHTML = '<p class="loading">No board members found. Add your first board member above.</p>';
                 return;
             }
 
-            let html = '';
+            // Collect all members and sort them by order
+            const members = [];
             querySnapshot.forEach((docSnap) => {
-                const member = docSnap.data();
-                const id = docSnap.id;
+                members.push({
+                    id: docSnap.id,
+                    ...docSnap.data()
+                });
+            });
+            
+            // Sort by order field
+            members.sort((a, b) => (a.order || 999) - (b.order || 999));
+
+            let html = '';
+            members.forEach(({ id, ...member }) => {
                 
                 html += `
                     <div class="program-item">
