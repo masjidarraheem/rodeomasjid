@@ -518,7 +518,7 @@ class AdminPanel {
                             <div class="announcement-title">${announcement.title}</div>
                             <div class="announcement-message">${announcement.message}</div>
                             <div class="announcement-meta">
-                                <span class="announcement-priority ${priorityClass}">${announcement.priority.toUpperCase()}</span>
+                                <span class="announcement-priority ${priorityClass}">${announcement.priority === 'low' ? 'NOTIFICATION' : announcement.priority === 'medium' ? 'ANNOUNCEMENT' : 'EMERGENCY'}</span>
                                 <span style="color: ${announcement.isActive && !isExpired ? '#48bb78' : '#e53e3e'};">
                                     ${announcement.isActive && !isExpired ? '✓ Active' : '✗ Inactive'}
                                 </span>
