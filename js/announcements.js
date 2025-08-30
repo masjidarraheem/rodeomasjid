@@ -231,12 +231,18 @@ class AnnouncementManager {
                 button.style.background = priorityColors[this.currentAnnouncement.priority] || priorityColors.low;
             }
             
-            // Restore saved position if exists
+            // Restore saved position if exists, otherwise use default top-right
             const savedPosition = this.getSavedPosition();
             if (savedPosition) {
                 floatingBtn.style.left = savedPosition.left;
                 floatingBtn.style.right = 'auto';
                 floatingBtn.style.top = savedPosition.top;
+                floatingBtn.style.bottom = 'auto';
+            } else {
+                // Default position: top right below menu
+                floatingBtn.style.top = '80px';
+                floatingBtn.style.right = '20px';
+                floatingBtn.style.left = 'auto';
                 floatingBtn.style.bottom = 'auto';
             }
         }
