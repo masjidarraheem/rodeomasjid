@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Board Members Index Test</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .test-section {
+            margin: 30px 0;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+
+        .test-section h2 {
+            color: #495057;
+            margin-bottom: 15px;
+            font-size: 20px;
+        }
+
+        button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            margin: 10px 10px 10px 0;
+            transition: background 0.3s;
+        }
+
+        button:hover {
+            background: #5a67d8;
+        }
+
+        button.danger {
+            background: #e74c3c;
+        }
+
+        button.danger:hover {
+            background: #c0392b;
+        }
+
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            display: none;
+        }
+
+        .result.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+            display: block;
+        }
+
+        .result.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+            display: block;
+        }
+
+        .index-link {
+            display: block;
+            margin-top: 20px;
+            padding: 20px;
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 8px;
+            word-break: break-all;
+        }
+
+        .index-link a {
+            color: #0066cc;
+            text-decoration: none;
+        }
+
+        .index-link a:hover {
+            text-decoration: underline;
+        }
+
+        .board-list {
+            margin-top: 20px;
+        }
+
+        .board-item {
+            padding: 15px;
+            background: white;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .board-info {
+            flex: 1;
+        }
+
+        .board-name {
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+
+        .board-order {
+            font-size: 14px;
+            color: #6c757d;
+        }
+
+        pre {
+            background: #f4f4f4;
+            padding: 15px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin-top: 10px;
+        }
+
+        .loading {
+            text-align: center;
+            color: #6c757d;
+            padding: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 Board Members Firestore Index Test</h1>
+
+        <!-- Test Write Operation -->
+        <div class="test-section">
+            <h2>1. Test Write Operation</h2>
+            <p>Add a test board member to Firestore:</p>
+            <button onclick="addTestMember()">Add Test Member</button>
+            <button onclick="addMultipleMembers()">Add 5 Test Members</button>
+            <div id="writeResult" class="result"></div>
+        </div>
+
+        <!-- Test Query Operation -->
+        <div class="test-section">
+            <h2>2. Test Query Operation (This triggers index creation)</h2>
+            <p>Query board members ordered by 'order' field:</p>
+            <button onclick="queryMembers()">Run Query</button>
+            <div id="queryResult" class="result"></div>
+            <div id="indexLink" class="index-link" style="display: none;">
+                <strong>⚠️ Index Required!</strong><br>
+                Click this link to create the index in Firebase Console:<br>
+                <a id="indexUrl" href="#" target="_blank">Create Index</a>
+            </div>
+            <div id="membersList" class="board-list"></div>
+        </div>
+
+        <!-- Delete Test Data -->
+        <div class="test-section">
+            <h2>3. Clean Up Test Data</h2>
+            <p>Delete all test board members:</p>
+            <button onclick="deleteTestMembers()" class="danger">Delete All Test Members</button>
+            <div id="deleteResult" class="result"></div>
+        </div>
+
+        <!-- Connection Status -->
+        <div class="test-section">
+            <h2>Connection Status</h2>
+            <div id="connectionStatus">Checking connection...</div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { 
+            getFirestore, 
+            collection, 
+            addDoc, 
+            getDocs,
+            deleteDoc,
+            doc,
+            query,
+            orderBy,
+            where
+        } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyDeuget47p0lBCRK9EConW-FNmORpQc248",
+            authDomain: "masjid-ar-raheem.firebaseapp.com",
+            projectId: "masjid-ar-raheem",
+            storageBucket: "masjid-ar-raheem.appspot.com",
+            messagingSenderId: "290589406708",
+            appId: "1:290589406708:web:e5e0cddb9077f74b0c62b1"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // Update connection status
+        document.getElementById('connectionStatus').innerHTML = '<span style="color: green;">✓ Connected to Firebase</span>';
+
+        // Make functions available globally
+        window.addTestMember = async function() {
+            const writeResult = document.getElementById('writeResult');
+            try {
+                const testMember = {
+                    name: `Test Member ${Date.now()}`,
+                    order: Math.floor(Math.random() * 100),
+                    createdAt: new Date(),
+                    updatedAt: new Date()
+                };
+
+                const docRef = await addDoc(collection(db, 'boardMembers'), testMember);
+                writeResult.className = 'result success';
+                writeResult.innerHTML = `✓ Successfully added test member with ID: ${docRef.id}<br>
+                    <pre>${JSON.stringify(testMember, null, 2)}</pre>`;
+            } catch (error) {
+                writeResult.className = 'result error';
+                writeResult.innerHTML = `✗ Error adding member: ${error.message}`;
+                console.error('Error:', error);
+            }
+        };
+
+        window.addMultipleMembers = async function() {
+            const writeResult = document.getElementById('writeResult');
+            try {
+                const promises = [];
+                for (let i = 1; i <= 5; i++) {
+                    const testMember = {
+                        name: `Board Member ${i}`,
+                        order: i * 10,
+                        createdAt: new Date(),
+                        updatedAt: new Date()
+                    };
+                    promises.push(addDoc(collection(db, 'boardMembers'), testMember));
+                }
+                
+                await Promise.all(promises);
+                writeResult.className = 'result success';
+                writeResult.innerHTML = `✓ Successfully added 5 test board members`;
+            } catch (error) {
+                writeResult.className = 'result error';
+                writeResult.innerHTML = `✗ Error adding members: ${error.message}`;
+                console.error('Error:', error);
+            }
+        };
+
+        window.queryMembers = async function() {
+            const queryResult = document.getElementById('queryResult');
+            const indexLink = document.getElementById('indexLink');
+            const membersList = document.getElementById('membersList');
+            
+            try {
+                // This query will trigger the need for an index
+                const q = query(collection(db, 'boardMembers'), orderBy('order', 'asc'));
+                const querySnapshot = await getDocs(q);
+                
+                if (querySnapshot.empty) {
+                    queryResult.className = 'result error';
+                    queryResult.innerHTML = '⚠️ No board members found. Add some test members first.';
+                    membersList.innerHTML = '';
+                    return;
+                }
+
+                let html = '<h3>Board Members (Ordered by display order):</h3>';
+                querySnapshot.forEach((doc) => {
+                    const member = doc.data();
+                    html += `
+                        <div class="board-item">
+                            <div class="board-info">
+                                <div class="board-name">${member.name}</div>
+                                <div class="board-order">Order: ${member.order}</div>
+                            </div>
+                        </div>
+                    `;
+                });
+
+                queryResult.className = 'result success';
+                queryResult.innerHTML = `✓ Query successful! Found ${querySnapshot.size} board members.`;
+                membersList.innerHTML = html;
+                indexLink.style.display = 'none';
+                
+            } catch (error) {
+                queryResult.className = 'result error';
+                queryResult.innerHTML = `✗ Query failed: ${error.message}`;
+                
+                // If it's an index error, show the link to create index
+                if (error.message.includes('index') || error.message.includes('FAILED_PRECONDITION')) {
+                    indexLink.style.display = 'block';
+                    
+                    // Generate the index creation URL
+                    const projectId = 'masjid-ar-raheem';
+                    const indexUrl = `https://console.firebase.google.com/project/${projectId}/firestore/indexes?create_composite=ClVwcm9qZWN0cy9tYXNqaWQtYXItcmFoZWVtL2RhdGFiYXNlcy8oZGVmYXVsdCkvY29sbGVjdGlvbkdyb3Vwcy9ib2FyZE1lbWJlcnMvaW5kZXhlcy9fEAEaCQoFb3JkZXIQARoMCghfX25hbWVfXxAB`;
+                    
+                    document.getElementById('indexUrl').href = indexUrl;
+                    document.getElementById('indexUrl').innerHTML = 'Click here to create the required index';
+                }
+                console.error('Query error:', error);
+            }
+        };
+
+        window.deleteTestMembers = async function() {
+            const deleteResult = document.getElementById('deleteResult');
+            try {
+                const querySnapshot = await getDocs(collection(db, 'boardMembers'));
+                
+                if (querySnapshot.empty) {
+                    deleteResult.className = 'result error';
+                    deleteResult.innerHTML = '⚠️ No board members to delete.';
+                    return;
+                }
+
+                const deletePromises = [];
+                querySnapshot.forEach((docSnap) => {
+                    deletePromises.push(deleteDoc(doc(db, 'boardMembers', docSnap.id)));
+                });
+
+                await Promise.all(deletePromises);
+                
+                deleteResult.className = 'result success';
+                deleteResult.innerHTML = `✓ Successfully deleted ${deletePromises.length} board members.`;
+                
+                // Clear the members list
+                document.getElementById('membersList').innerHTML = '';
+                
+            } catch (error) {
+                deleteResult.className = 'result error';
+                deleteResult.innerHTML = `✗ Error deleting members: ${error.message}`;
+                console.error('Error:', error);
+            }
+        };
+
+        // Automatically try to query on load to check if index exists
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                console.log('Checking if index exists...');
+                queryMembers();
+            }, 1000);
+        });
+    </script>
+</body>
+</html>
