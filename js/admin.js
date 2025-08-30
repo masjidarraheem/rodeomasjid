@@ -845,6 +845,11 @@ class AdminPanel {
         const form = document.getElementById('boardForm');
         const cancelBtn = document.getElementById('cancelBoardEdit');
 
+        if (!form) {
+            console.error('Board form not found');
+            return;
+        }
+
         form.addEventListener('submit', (e) => {
             e.preventDefault();
             if (this.editingBoardId) {
@@ -854,14 +859,25 @@ class AdminPanel {
             }
         });
 
-        cancelBtn.addEventListener('click', () => {
-            this.resetBoardForm();
-        });
+        if (cancelBtn) {
+            cancelBtn.addEventListener('click', () => {
+                this.resetBoardForm();
+            });
+        }
     }
 
     async addBoardMember() {
-        const name = document.getElementById('memberName').value.trim();
-        const order = parseInt(document.getElementById('memberOrder').value) || 999;
+        const nameElement = document.getElementById('memberName');
+        const orderElement = document.getElementById('memberOrder');
+        
+        if (!nameElement || !orderElement) {
+            console.error('Form elements not found:', { nameElement, orderElement });
+            this.showError('Form error. Please refresh the page.');
+            return;
+        }
+
+        const name = nameElement.value.trim();
+        const order = parseInt(orderElement.value) || 999;
 
         if (!name) {
             this.showError('Please enter a name');
@@ -881,13 +897,22 @@ class AdminPanel {
             this.loadBoardMembers();
         } catch (error) {
             console.error('Error adding board member:', error);
-            this.showError('Error adding board member. Please try again.');
+            this.showError(`Error adding board member: ${error.message}`);
         }
     }
 
     async updateBoardMember() {
-        const name = document.getElementById('memberName').value.trim();
-        const order = parseInt(document.getElementById('memberOrder').value) || 999;
+        const nameElement = document.getElementById('memberName');
+        const orderElement = document.getElementById('memberOrder');
+        
+        if (!nameElement || !orderElement) {
+            console.error('Form elements not found:', { nameElement, orderElement });
+            this.showError('Form error. Please refresh the page.');
+            return;
+        }
+
+        const name = nameElement.value.trim();
+        const order = parseInt(orderElement.value) || 999;
 
         if (!name) {
             this.showError('Please enter a name');
@@ -907,7 +932,7 @@ class AdminPanel {
             this.loadBoardMembers();
         } catch (error) {
             console.error('Error updating board member:', error);
-            this.showError('Error updating board member. Please try again.');
+            this.showError(`Error updating board member: ${error.message}`);
         }
     }
 
@@ -953,6 +978,11 @@ class AdminPanel {
     async loadBoardMembers() {
         const boardList = document.getElementById('boardList');
         
+        if (!boardList) {
+            console.log('Board list element not found - board tab may not be active');
+            return;
+        }
+        
         try {
             const q = query(collection(db, 'boardMembers'), orderBy('order', 'asc'));
             const querySnapshot = await getDocs(q);
@@ -993,7 +1023,13 @@ class AdminPanel {
             boardList.innerHTML = html;
         } catch (error) {
             console.error('Error loading board members:', error);
-            boardList.innerHTML = '<p class="loading">Error loading board members. Please refresh the page.</p>';
+            if (error.code === 'permission-denied' || error.message.includes('permission')) {
+                boardList.innerHTML = '<p class="loading">Permission error. Board members collection may need to be initialized. Try adding a member first.</p>';
+            } else if (error.message.includes('index')) {
+                boardList.innerHTML = '<p class="loading">Database index required. Please contact administrator to create index for boardMembers collection.</p>';
+            } else {
+                boardList.innerHTML = `<p class="loading">Error loading board members: ${error.message}</p>`;
+            }
         }
     }
 }
