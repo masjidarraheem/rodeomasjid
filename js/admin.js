@@ -861,29 +861,17 @@ class AdminPanel {
 
     async addBoardMember() {
         const name = document.getElementById('memberName').value.trim();
-        const position = document.getElementById('memberPosition').value.trim();
-        const bio = document.getElementById('memberBio').value.trim();
-        const email = document.getElementById('memberEmail').value.trim();
-        const phone = document.getElementById('memberPhone').value.trim();
-        const photo = document.getElementById('memberPhoto').value.trim();
         const order = parseInt(document.getElementById('memberOrder').value) || 999;
-        const isActive = document.getElementById('memberActive').value === 'true';
 
-        if (!name || !position) {
-            this.showError('Please fill in at least name and position');
+        if (!name) {
+            this.showError('Please enter a name');
             return;
         }
 
         try {
             await addDoc(collection(db, 'boardMembers'), {
                 name: name,
-                position: position,
-                bio: bio,
-                email: email,
-                phone: phone,
-                photo: photo || null,
                 order: order,
-                isActive: isActive,
                 createdAt: new Date(),
                 updatedAt: new Date()
             });
@@ -899,16 +887,10 @@ class AdminPanel {
 
     async updateBoardMember() {
         const name = document.getElementById('memberName').value.trim();
-        const position = document.getElementById('memberPosition').value.trim();
-        const bio = document.getElementById('memberBio').value.trim();
-        const email = document.getElementById('memberEmail').value.trim();
-        const phone = document.getElementById('memberPhone').value.trim();
-        const photo = document.getElementById('memberPhoto').value.trim();
         const order = parseInt(document.getElementById('memberOrder').value) || 999;
-        const isActive = document.getElementById('memberActive').value === 'true';
 
-        if (!name || !position) {
-            this.showError('Please fill in at least name and position');
+        if (!name) {
+            this.showError('Please enter a name');
             return;
         }
 
@@ -916,13 +898,7 @@ class AdminPanel {
             const memberRef = doc(db, 'boardMembers', this.editingBoardId);
             await updateDoc(memberRef, {
                 name: name,
-                position: position,
-                bio: bio,
-                email: email,
-                phone: phone,
-                photo: photo || null,
                 order: order,
-                isActive: isActive,
                 updatedAt: new Date()
             });
 
@@ -954,13 +930,7 @@ class AdminPanel {
         this.editingBoardId = id;
         
         document.getElementById('memberName').value = member.name;
-        document.getElementById('memberPosition').value = member.position;
-        document.getElementById('memberBio').value = member.bio || '';
-        document.getElementById('memberEmail').value = member.email || '';
-        document.getElementById('memberPhone').value = member.phone || '';
-        document.getElementById('memberPhoto').value = member.photo || '';
         document.getElementById('memberOrder').value = member.order || 999;
-        document.getElementById('memberActive').value = member.isActive.toString();
 
         document.getElementById('cancelBoardEdit').style.display = 'inline-block';
         document.querySelector('#boardForm button[type="submit"]').textContent = 'Update Member';
@@ -1000,24 +970,11 @@ class AdminPanel {
                 html += `
                     <div class="program-item">
                         <div class="program-info">
-                            ${member.photo ? `
-                                <div style="width: 60px; height: 60px; border-radius: 10px; overflow: hidden; flex-shrink: 0;">
-                                    <img src="${member.photo}" alt="${member.name}" style="width: 100%; height: 100%; object-fit: cover;">
-                                </div>
-                            ` : `
-                                <div style="width: 60px; height: 60px; border-radius: 10px; background: #f0f0f0; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
-                                    <i class="fas fa-user" style="font-size: 24px; color: #999;"></i>
-                                </div>
-                            `}
+                            <div style="width: 60px; height: 60px; border-radius: 10px; background: #f0f0f0; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                                <i class="fas fa-user" style="font-size: 24px; color: #999;"></i>
+                            </div>
                             <div class="program-details">
                                 <h3>${member.name}</h3>
-                                <p style="font-weight: 600; color: #667eea;">${member.position}</p>
-                                ${member.bio ? `<p style="font-size: 14px; color: #666; margin-top: 5px;">${member.bio}</p>` : ''}
-                                ${member.email ? `<p style="font-size: 13px; color: #666;"><i class="fas fa-envelope"></i> ${member.email}</p>` : ''}
-                                ${member.phone ? `<p style="font-size: 13px; color: #666;"><i class="fas fa-phone"></i> ${member.phone}</p>` : ''}
-                                <p style="font-size: 14px; color: ${member.isActive ? '#48bb78' : '#e53e3e'}; margin-top: 5px;">
-                                    ${member.isActive ? '✓ Active' : '✗ Inactive'}
-                                </p>
                                 <p style="font-size: 12px; color: #999;">Display Order: ${member.order}</p>
                             </div>
                         </div>
