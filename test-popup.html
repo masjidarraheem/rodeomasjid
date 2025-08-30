@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Announcement Popup</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .debug {
+            background: white;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .status { 
+            padding: 10px; 
+            margin: 5px 0; 
+            border-radius: 4px;
+        }
+        .success { background: #d4edda; color: #155724; }
+        .error { background: #f8d7da; color: #721c24; }
+        .info { background: #d1ecf1; color: #0c5460; }
+        pre { 
+            background: #f0f0f0; 
+            padding: 10px; 
+            overflow-x: auto;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Announcement Popup Test</h1>
+    
+    <div class="debug">
+        <h2>Test Controls</h2>
+        <button onclick="clearLocalStorage()">Clear Local Storage</button>
+        <button onclick="showTestModal()">Show Test Modal</button>
+        <button onclick="loadAnnouncements()">Reload Announcements</button>
+    </div>
+
+    <div class="debug">
+        <h2>Status</h2>
+        <div id="status"></div>
+    </div>
+
+    <div class="debug">
+        <h2>Console Log</h2>
+        <pre id="console"></pre>
+    </div>
+
+    <!-- Copy of the announcement HTML from index.html -->
+    <!-- Announcement Popup Modal -->
+    <div id="announcementModal" style="display: none; position: fixed; inset: 0; z-index: 10000; animation: fadeIn 0.3s ease;">
+        <!-- Backdrop -->
+        <div id="modalBackdrop" style="position: absolute; inset: 0; background: rgba(0, 0, 0, 0.5); backdrop-filter: blur(4px);"></div>
+        
+        <!-- Modal Content -->
+        <div id="modalContent" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; border-radius: 20px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); max-width: 500px; width: 90%; max-height: 80vh; overflow: hidden; animation: slideUp 0.3s ease;">
+            <!-- Modal Header -->
+            <div id="modalHeader" style="padding: 25px 25px 20px 25px; border-bottom: 1px solid #e0e0e0; position: relative;">
+                <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 10px;">
+                    <div id="announcementIcon" style="width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 20px;">
+                        📢
+                    </div>
+                    <div>
+                        <div id="announcementPriorityBadge" style="display: inline-block; padding: 3px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; text-transform: uppercase; margin-bottom: 5px;"></div>
+                        <div id="announcementTitle" style="font-size: 20px; font-weight: 700; color: #2c3e50;"></div>
+                    </div>
+                </div>
+                <!-- Action buttons -->
+                <div style="position: absolute; top: 20px; right: 20px; display: flex; gap: 8px;">
+                    <button onclick="minimizeAnnouncement()" style="background: #f0f0f0; border: none; width: 32px; height: 32px; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s;" title="Minimize">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                        </svg>
+                    </button>
+                    <button onclick="closeAnnouncementModal()" style="background: #f0f0f0; border: none; width: 32px; height: 32px; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s;" title="Close">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Modal Body -->
+            <div style="padding: 25px; overflow-y: auto; max-height: 400px;">
+                <div id="announcementMessage" style="font-size: 16px; line-height: 1.6; color: #4a5568;"></div>
+                <div id="announcementExpiry" style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #e0e0e0; font-size: 13px; color: #718096;"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Floating Announcement Button (Initially Hidden) -->
+    <div id="floatingButton" style="display: none; position: fixed; bottom: 30px; right: 30px; z-index: 9999; cursor: move; user-select: none;">
+        <button onclick="expandAnnouncement()" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none; width: 60px; height: 60px; border-radius: 50%; color: white; font-size: 24px; cursor: pointer; box-shadow: 0 4px 20px rgba(102, 126, 234, 0.4); transition: all 0.3s; position: relative; animation: pulse 2s infinite;">
+            <span style="position: relative;">📢</span>
+            <span id="notificationDot" style="position: absolute; top: 8px; right: 8px; width: 12px; height: 12px; background: #ff4444; border-radius: 50%; border: 2px solid white;"></span>
+        </button>
+    </div>
+
+    <style>
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        @keyframes slideUp {
+            from { 
+                opacity: 0;
+                transform: translate(-50%, -40%);
+            }
+            to { 
+                opacity: 1;
+                transform: translate(-50%, -50%);
+            }
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        .priority-high {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+        
+        .priority-medium {
+            background: #fef3c7;
+            color: #d97706;
+        }
+        
+        .priority-low {
+            background: #dbeafe;
+            color: #2563eb;
+        }
+    </style>
+
+    <script src="js/env.js"></script>
+    <script type="module">
+        const log = (msg, type = 'info') => {
+            const consoleEl = document.getElementById('console');
+            const timestamp = new Date().toLocaleTimeString();
+            consoleEl.innerHTML += `[${timestamp}] ${type.toUpperCase()}: ${msg}\n`;
+            console.log(msg);
+        };
+
+        const addStatus = (msg, type = 'info') => {
+            const statusEl = document.getElementById('status');
+            const div = document.createElement('div');
+            div.className = `status ${type}`;
+            div.textContent = msg;
+            statusEl.appendChild(div);
+        };
+
+        // Test functions
+        window.clearLocalStorage = () => {
+            localStorage.clear();
+            log('Local storage cleared');
+            addStatus('Local storage cleared', 'success');
+            location.reload();
+        };
+
+        window.showTestModal = () => {
+            const modal = document.getElementById('announcementModal');
+            const title = document.getElementById('announcementTitle');
+            const message = document.getElementById('announcementMessage');
+            const badge = document.getElementById('announcementPriorityBadge');
+            
+            title.textContent = 'Test Announcement';
+            message.textContent = 'This is a test announcement to verify the modal works correctly.';
+            badge.textContent = 'HIGH';
+            badge.className = 'priority-high';
+            
+            modal.style.display = 'block';
+            setTimeout(() => {
+                modal.style.opacity = '1';
+            }, 10);
+            
+            log('Test modal displayed');
+            addStatus('Test modal shown', 'success');
+        };
+
+        window.loadAnnouncements = async () => {
+            log('Loading announcements...');
+            try {
+                // Import and run the announcement manager
+                const module = await import('./js/announcements.js?t=' + Date.now());
+                log('Announcement module loaded');
+                addStatus('Announcement module loaded', 'success');
+            } catch (error) {
+                log(`Error loading announcements: ${error.message}`, 'error');
+                addStatus(`Error: ${error.message}`, 'error');
+            }
+        };
+
+        // Check DOM elements
+        const checkElements = () => {
+            const elements = [
+                'announcementModal',
+                'announcementTitle',
+                'announcementMessage',
+                'announcementPriorityBadge',
+                'floatingButton'
+            ];
+            
+            elements.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) {
+                    log(`✓ Element #${id} found`);
+                    addStatus(`Element #${id} exists`, 'success');
+                } else {
+                    log(`✗ Element #${id} NOT found`, 'error');
+                    addStatus(`Element #${id} missing`, 'error');
+                }
+            });
+        };
+
+        // Check Firebase config
+        const checkFirebase = () => {
+            if (window.ENV) {
+                const hasConfig = window.ENV.FIREBASE_API_KEY && 
+                                window.ENV.FIREBASE_API_KEY !== "PLACEHOLDER_FIREBASE_API_KEY";
+                if (hasConfig) {
+                    log('Firebase config valid');
+                    addStatus('Firebase configured', 'success');
+                } else {
+                    log('Firebase config has placeholders', 'error');
+                    addStatus('Firebase not configured', 'error');
+                }
+            } else {
+                log('window.ENV not found', 'error');
+                addStatus('Environment variables missing', 'error');
+            }
+        };
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            log('Page loaded, running checks...');
+            checkElements();
+            checkFirebase();
+            
+            // Try to load announcements
+            setTimeout(() => {
+                log('Attempting to load announcements...');
+                loadAnnouncements();
+            }, 1000);
+        });
+    </script>
+</body>
+</html>
