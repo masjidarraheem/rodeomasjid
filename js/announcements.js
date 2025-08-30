@@ -151,10 +151,11 @@ class AnnouncementManager {
             } else {
                 // Show modal
                 modal.style.display = 'block';
+                modal.style.opacity = '0';
                 // Add a small delay for animation
                 setTimeout(() => {
                     modal.style.opacity = '1';
-                }, 10);
+                }, 50);
             }
         }
     }
@@ -267,67 +268,67 @@ class AnnouncementManager {
         if (!floatingBtn) return;
 
         let isDragging = false;
-        let currentX;
-        let currentY;
-        let initialX;
-        let initialY;
-        let xOffset = 0;
-        let yOffset = 0;
+        let startX, startY, initialLeft, initialTop;
 
         const dragStart = (e) => {
+            isDragging = true;
+            floatingBtn.style.transition = 'none';
+            
+            // Get initial position
+            const rect = floatingBtn.getBoundingClientRect();
+            initialLeft = rect.left;
+            initialTop = rect.top;
+            
+            // Get start point
             if (e.type === "touchstart") {
-                initialX = e.touches[0].clientX - xOffset;
-                initialY = e.touches[0].clientY - yOffset;
+                startX = e.touches[0].clientX;
+                startY = e.touches[0].clientY;
             } else {
-                initialX = e.clientX - xOffset;
-                initialY = e.clientY - yOffset;
-            }
-
-            if (e.target === floatingBtn || floatingBtn.contains(e.target)) {
-                isDragging = true;
-                floatingBtn.style.transition = 'none';
+                startX = e.clientX;
+                startY = e.clientY;
+                e.preventDefault();
             }
         };
 
-        const dragEnd = (e) => {
-            initialX = currentX;
-            initialY = currentY;
+        const dragEnd = () => {
+            if (!isDragging) return;
             isDragging = false;
             floatingBtn.style.transition = 'all 0.3s';
             
             // Save position
-            this.savePosition(floatingBtn.style.left, floatingBtn.style.top);
+            const rect = floatingBtn.getBoundingClientRect();
+            this.savePosition(`${rect.left}px`, `${rect.top}px`);
         };
 
         const drag = (e) => {
-            if (isDragging) {
-                e.preventDefault();
-                
-                if (e.type === "touchmove") {
-                    currentX = e.touches[0].clientX - initialX;
-                    currentY = e.touches[0].clientY - initialY;
-                } else {
-                    currentX = e.clientX - initialX;
-                    currentY = e.clientY - initialY;
-                }
-
-                xOffset = currentX;
-                yOffset = currentY;
-
-                // Keep button within viewport
-                const rect = floatingBtn.getBoundingClientRect();
-                const maxX = window.innerWidth - rect.width;
-                const maxY = window.innerHeight - rect.height;
-                
-                currentX = Math.max(0, Math.min(currentX, maxX));
-                currentY = Math.max(0, Math.min(currentY, maxY));
-
-                floatingBtn.style.transform = `translate(${currentX}px, ${currentY}px)`;
-                floatingBtn.style.left = '30px';
-                floatingBtn.style.right = 'auto';
-                floatingBtn.style.top = '30px';
-                floatingBtn.style.bottom = 'auto';
+            if (!isDragging) return;
+            e.preventDefault();
+            
+            let currentX, currentY;
+            if (e.type === "touchmove") {
+                currentX = e.touches[0].clientX;
+                currentY = e.touches[0].clientY;
+            } else {
+                currentX = e.clientX;
+                currentY = e.clientY;
             }
+            
+            // Calculate new position
+            let newLeft = initialLeft + (currentX - startX);
+            let newTop = initialTop + (currentY - startY);
+            
+            // Keep button within viewport
+            const btnWidth = floatingBtn.offsetWidth;
+            const btnHeight = floatingBtn.offsetHeight;
+            
+            newLeft = Math.max(10, Math.min(newLeft, window.innerWidth - btnWidth - 10));
+            newTop = Math.max(10, Math.min(newTop, window.innerHeight - btnHeight - 10));
+            
+            // Apply position
+            floatingBtn.style.left = `${newLeft}px`;
+            floatingBtn.style.right = 'auto';
+            floatingBtn.style.top = `${newTop}px`;
+            floatingBtn.style.bottom = 'auto';
         };
 
         // Mouse events
