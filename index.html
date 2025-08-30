@@ -124,10 +124,70 @@
             }
         }
         
+        @keyframes minimizeToButton {
+            0% {
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(1);
+            }
+            50% {
+                opacity: 0.8;
+                transform: translate(-50%, -50%) scale(0.3);
+            }
+            100% {
+                opacity: 0;
+                transform: translate(-50%, -50%) scale(0);
+            }
+        }
+        
+        @keyframes expandFromButton {
+            0% {
+                opacity: 0;
+                transform: translate(-50%, -50%) scale(0);
+            }
+            50% {
+                opacity: 0.8;
+                transform: translate(-50%, -50%) scale(0.3);
+            }
+            100% {
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(1);
+            }
+        }
+        
+        @keyframes bounceIn {
+            0% {
+                opacity: 0;
+                transform: scale(0.3);
+            }
+            50% {
+                opacity: 1;
+                transform: scale(1.05);
+            }
+            70% {
+                transform: scale(0.9);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+        
         @keyframes pulse {
             0% { transform: scale(1); }
             50% { transform: scale(1.05); }
             100% { transform: scale(1); }
+        }
+        
+        .modal-minimizing #modalContent {
+            animation: minimizeToButton 0.5s ease-out forwards;
+        }
+        
+        .modal-expanding #modalContent {
+            animation: expandFromButton 0.5s ease-out forwards;
+        }
+        
+        .button-appearing {
+            animation: bounceIn 0.6s ease-out;
         }
         
         #floatingButton button:hover {

@@ -18,9 +18,11 @@ class AnnouncementManager {
     }
 
     async init() {
+        console.log('[Announcements] Initializing...');
         await this.loadActiveAnnouncement();
         this.setupEventHandlers();
         this.setupDraggable();
+        console.log('[Announcements] Initialization complete');
     }
 
     async loadActiveAnnouncement() {
@@ -93,7 +95,12 @@ class AnnouncementManager {
     }
 
     displayAnnouncement() {
-        if (!this.currentAnnouncement) return;
+        if (!this.currentAnnouncement) {
+            console.log('[Announcements] No current announcement to display');
+            return;
+        }
+
+        console.log('[Announcements] Displaying announcement:', this.currentAnnouncement.title);
 
         const modal = document.getElementById('announcementModal');
         const titleElement = document.getElementById('announcementTitle');
@@ -178,13 +185,21 @@ class AnnouncementManager {
         const floatingBtn = document.getElementById('floatingButton');
         
         if (modal && floatingBtn) {
-            // Animate modal out
-            modal.style.opacity = '0';
+            // Add minimizing animation class
+            modal.classList.add('modal-minimizing');
+            
+            // Get button position for smooth transition
+            const btnRect = floatingBtn.getBoundingClientRect();
+            const modalRect = modal.querySelector('#modalContent').getBoundingClientRect();
+            
+            // Wait for animation to complete
             setTimeout(() => {
                 modal.style.display = 'none';
-                // Show floating button
-                this.showFloatingButton();
-            }, 300);
+                modal.classList.remove('modal-minimizing');
+                
+                // Show floating button with bounce animation
+                this.showFloatingButton(true);
+            }, 500);
             
             // Remember minimized state
             if (this.currentAnnouncement) {
@@ -193,10 +208,18 @@ class AnnouncementManager {
         }
     }
 
-    showFloatingButton() {
+    showFloatingButton(animate = false) {
         const floatingBtn = document.getElementById('floatingButton');
         if (floatingBtn) {
             floatingBtn.style.display = 'block';
+            
+            // Add bounce animation if requested
+            if (animate) {
+                floatingBtn.classList.add('button-appearing');
+                setTimeout(() => {
+                    floatingBtn.classList.remove('button-appearing');
+                }, 600);
+            }
             // Set button color based on priority
             const button = floatingBtn.querySelector('button');
             if (button && this.currentAnnouncement) {
@@ -224,15 +247,28 @@ class AnnouncementManager {
         const floatingBtn = document.getElementById('floatingButton');
         
         if (modal && floatingBtn) {
-            // Hide floating button
-            floatingBtn.style.display = 'none';
+            // Hide floating button with fade
+            floatingBtn.style.opacity = '0';
+            floatingBtn.style.transform = 'scale(0.5)';
             
-            // Show modal
+            setTimeout(() => {
+                floatingBtn.style.display = 'none';
+                floatingBtn.style.opacity = '1';
+                floatingBtn.style.transform = 'scale(1)';
+            }, 300);
+            
+            // Show modal with expand animation
             modal.style.display = 'block';
+            modal.classList.add('modal-expanding');
             modal.style.opacity = '0';
+            
             setTimeout(() => {
                 modal.style.opacity = '1';
             }, 10);
+            
+            setTimeout(() => {
+                modal.classList.remove('modal-expanding');
+            }, 500);
             
             // Clear minimized state
             if (this.currentAnnouncement) {
