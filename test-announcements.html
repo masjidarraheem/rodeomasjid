@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Announcements</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .status {
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+            background: white;
+            border-left: 4px solid #ccc;
+        }
+        .error {
+            border-left-color: #e53e3e;
+            background: #fee2e2;
+        }
+        .success {
+            border-left-color: #48bb78;
+            background: #e6fffa;
+        }
+        .announcement {
+            background: white;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        pre {
+            background: #f0f0f0;
+            padding: 10px;
+            border-radius: 3px;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>Announcement Test Page</h1>
+    
+    <div id="configStatus" class="status">Checking Firebase configuration...</div>
+    <div id="connectionStatus" class="status">Testing Firestore connection...</div>
+    <div id="queryStatus" class="status">Testing announcement query...</div>
+    
+    <h2>Announcements Found:</h2>
+    <div id="announcements"></div>
+    
+    <h2>Console Output:</h2>
+    <pre id="console"></pre>
+
+    <script src="js/env.js"></script>
+    <script type="module">
+        const log = (msg, type = 'info') => {
+            const consoleEl = document.getElementById('console');
+            const timestamp = new Date().toLocaleTimeString();
+            consoleEl.innerHTML += `[${timestamp}] ${type.toUpperCase()}: ${msg}\n`;
+            console.log(msg);
+        };
+
+        // Check Firebase configuration
+        const configEl = document.getElementById('configStatus');
+        if (window.ENV) {
+            const hasConfig = window.ENV.FIREBASE_API_KEY && 
+                            window.ENV.FIREBASE_API_KEY !== "PLACEHOLDER_FIREBASE_API_KEY";
+            
+            if (hasConfig) {
+                configEl.className = 'status success';
+                configEl.innerHTML = '✓ Firebase configuration found';
+                log('Firebase config loaded: ' + JSON.stringify({
+                    apiKey: window.ENV.FIREBASE_API_KEY ? '***' + window.ENV.FIREBASE_API_KEY.slice(-4) : 'missing',
+                    projectId: window.ENV.FIREBASE_PROJECT_ID || 'missing'
+                }));
+            } else {
+                configEl.className = 'status error';
+                configEl.innerHTML = '✗ Firebase configuration has placeholder values';
+                log('Firebase config has placeholders - needs real values', 'error');
+            }
+        } else {
+            configEl.className = 'status error';
+            configEl.innerHTML = '✗ window.ENV not found';
+            log('window.ENV is undefined', 'error');
+        }
+
+        // Test Firestore connection
+        import { db } from './js/firebase-config.js';
+        import { 
+            collection, 
+            getDocs, 
+            query, 
+            where, 
+            orderBy,
+            limit
+        } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+
+        const connectionEl = document.getElementById('connectionStatus');
+        const queryEl = document.getElementById('queryStatus');
+        const announcementsEl = document.getElementById('announcements');
+
+        async function testConnection() {
+            try {
+                log('Testing Firestore connection...');
+                
+                // First try a simple query without ordering
+                const simpleQuery = query(
+                    collection(db, 'announcements'),
+                    limit(1)
+                );
+                
+                const simpleSnapshot = await getDocs(simpleQuery);
+                
+                connectionEl.className = 'status success';
+                connectionEl.innerHTML = `✓ Firestore connected - Found ${simpleSnapshot.size} announcement(s) in database`;
+                log(`Simple query successful - ${simpleSnapshot.size} documents found`);
+                
+                // Now try the actual query with where and orderBy
+                log('Testing compound query with where and orderBy...');
+                const complexQuery = query(
+                    collection(db, 'announcements'),
+                    where('isActive', '==', true),
+                    orderBy('createdAt', 'desc')
+                );
+                
+                const complexSnapshot = await getDocs(complexQuery);
+                
+                queryEl.className = 'status success';
+                queryEl.innerHTML = `✓ Complex query successful - Found ${complexSnapshot.size} active announcement(s)`;
+                log(`Complex query successful - ${complexSnapshot.size} active announcements found`);
+                
+                // Display announcements
+                let html = '';
+                const now = new Date();
+                let validCount = 0;
+                
+                complexSnapshot.forEach(doc => {
+                    const data = doc.data();
+                    log(`Processing announcement: ${data.title}`);
+                    
+                    // Check expiry
+                    let isExpired = false;
+                    if (data.expiryDate) {
+                        const expiryDate = data.expiryDate.toDate ? 
+                            data.expiryDate.toDate() : 
+                            new Date(data.expiryDate);
+                        isExpired = expiryDate < now;
+                        log(`Expiry check: expires ${expiryDate}, expired: ${isExpired}`);
+                    }
+                    
+                    if (!isExpired) {
+                        validCount++;
+                        html += `
+                            <div class="announcement">
+                                <h3>${data.title}</h3>
+                                <p>${data.message}</p>
+                                <small>Priority: ${data.priority} | Active: ${data.isActive}</small>
+                            </div>
+                        `;
+                    }
+                });
+                
+                if (validCount > 0) {
+                    announcementsEl.innerHTML = html;
+                    log(`${validCount} valid announcement(s) ready to display`);
+                } else {
+                    announcementsEl.innerHTML = '<p>No valid active announcements found</p>';
+                    log('No valid announcements to display', 'warn');
+                }
+                
+            } catch (error) {
+                connectionEl.className = 'status error';
+                connectionEl.innerHTML = '✗ Firestore connection failed';
+                queryEl.className = 'status error';
+                queryEl.innerHTML = `✗ Query failed: ${error.message}`;
+                
+                log(`Error: ${error.message}`, 'error');
+                log(`Full error: ${JSON.stringify(error)}`, 'error');
+                
+                if (error.message.includes('index')) {
+                    log('INDEX REQUIRED: Check browser console for index creation link', 'error');
+                    announcementsEl.innerHTML = `
+                        <div class="status error">
+                            <strong>Index Required!</strong><br>
+                            Check your browser console (F12) for a direct link to create the required index in Firebase.
+                        </div>
+                    `;
+                }
+            }
+        }
+
+        // Run test
+        testConnection();
+    </script>
+</body>
+</html>
