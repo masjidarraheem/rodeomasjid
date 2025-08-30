@@ -801,6 +801,7 @@
             <div class="tabs">
                 <button class="tab-button active" data-tab="programs">Programs</button>
                 <button class="tab-button" data-tab="announcements">Announcements</button>
+                <button class="tab-button" data-tab="board">Board of Directors</button>
             </div>
 
             <!-- Programs Tab -->
@@ -893,6 +894,67 @@
                 <div class="programs-list">
                     <h2>Current Announcements</h2>
                     <div id="announcementsList" class="loading">Loading announcements...</div>
+                </div>
+            </div>
+
+            <!-- Board of Directors Tab -->
+            <div id="boardTab" class="tab-content">
+                <div class="form-section">
+                    <h2>Add Board Member</h2>
+                    <form id="boardForm">
+                        <div class="form-group">
+                            <label for="memberName">Name *</label>
+                            <input type="text" id="memberName" required placeholder="e.g., John Doe">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="memberPosition">Position *</label>
+                            <input type="text" id="memberPosition" required placeholder="e.g., President, Secretary, Treasurer">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="memberBio">Biography</label>
+                            <textarea id="memberBio" placeholder="Brief bio or description of the board member..."></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="memberEmail">Email</label>
+                            <input type="email" id="memberEmail" placeholder="email@example.com">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="memberPhone">Phone</label>
+                            <input type="tel" id="memberPhone" placeholder="(555) 123-4567">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="memberPhoto">Photo URL</label>
+                            <input type="text" id="memberPhoto" placeholder="https://example.com/photo.jpg">
+                            <small style="color: #666;">Enter a URL to the member's photo</small>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="memberOrder">Display Order</label>
+                            <input type="number" id="memberOrder" placeholder="1" value="999" min="0">
+                            <small style="color: #666;">Lower numbers appear first</small>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="memberActive">Status</label>
+                            <select id="memberActive">
+                                <option value="true">Active (Show on website)</option>
+                                <option value="false">Inactive (Hide from website)</option>
+                            </select>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary">Add Member</button>
+                        <button type="button" id="cancelBoardEdit" class="btn" style="background: #ccc; display: none;">Cancel Edit</button>
+                    </form>
+                </div>
+
+                <div class="programs-list">
+                    <h2>Current Board Members</h2>
+                    <div id="boardList" class="loading">Loading board members...</div>
                 </div>
             </div>
         </div>

@@ -19,6 +19,7 @@ class AdminPanel {
     constructor() {
         this.editingId = null;
         this.editingAnnouncementId = null;
+        this.editingBoardId = null;
         this.selectedIcon = null;
         this.currentUser = null;
         this.init();
@@ -89,8 +90,10 @@ class AdminPanel {
         this.setupIconSelector();
         this.setupForm();
         this.setupAnnouncementForm();
+        this.setupBoardForm();
         this.loadPrograms();
         this.loadAnnouncements();
+        this.loadBoardMembers();
     }
 
     setupTabs() {
@@ -834,6 +837,206 @@ class AdminPanel {
         } catch (error) {
             console.error('Error loading announcements:', error);
             announcementsList.innerHTML = '<p class="loading">Error loading announcements. Please refresh the page.</p>';
+        }
+    }
+
+    // Board of Directors Methods
+    setupBoardForm() {
+        const form = document.getElementById('boardForm');
+        const cancelBtn = document.getElementById('cancelBoardEdit');
+
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            if (this.editingBoardId) {
+                this.updateBoardMember();
+            } else {
+                this.addBoardMember();
+            }
+        });
+
+        cancelBtn.addEventListener('click', () => {
+            this.resetBoardForm();
+        });
+    }
+
+    async addBoardMember() {
+        const name = document.getElementById('memberName').value.trim();
+        const position = document.getElementById('memberPosition').value.trim();
+        const bio = document.getElementById('memberBio').value.trim();
+        const email = document.getElementById('memberEmail').value.trim();
+        const phone = document.getElementById('memberPhone').value.trim();
+        const photo = document.getElementById('memberPhoto').value.trim();
+        const order = parseInt(document.getElementById('memberOrder').value) || 999;
+        const isActive = document.getElementById('memberActive').value === 'true';
+
+        if (!name || !position) {
+            this.showError('Please fill in at least name and position');
+            return;
+        }
+
+        try {
+            await addDoc(collection(db, 'boardMembers'), {
+                name: name,
+                position: position,
+                bio: bio,
+                email: email,
+                phone: phone,
+                photo: photo || null,
+                order: order,
+                isActive: isActive,
+                createdAt: new Date(),
+                updatedAt: new Date()
+            });
+
+            this.showSuccess('Board member added successfully!');
+            this.resetBoardForm();
+            this.loadBoardMembers();
+        } catch (error) {
+            console.error('Error adding board member:', error);
+            this.showError('Error adding board member. Please try again.');
+        }
+    }
+
+    async updateBoardMember() {
+        const name = document.getElementById('memberName').value.trim();
+        const position = document.getElementById('memberPosition').value.trim();
+        const bio = document.getElementById('memberBio').value.trim();
+        const email = document.getElementById('memberEmail').value.trim();
+        const phone = document.getElementById('memberPhone').value.trim();
+        const photo = document.getElementById('memberPhoto').value.trim();
+        const order = parseInt(document.getElementById('memberOrder').value) || 999;
+        const isActive = document.getElementById('memberActive').value === 'true';
+
+        if (!name || !position) {
+            this.showError('Please fill in at least name and position');
+            return;
+        }
+
+        try {
+            const memberRef = doc(db, 'boardMembers', this.editingBoardId);
+            await updateDoc(memberRef, {
+                name: name,
+                position: position,
+                bio: bio,
+                email: email,
+                phone: phone,
+                photo: photo || null,
+                order: order,
+                isActive: isActive,
+                updatedAt: new Date()
+            });
+
+            this.showSuccess('Board member updated successfully!');
+            this.resetBoardForm();
+            this.loadBoardMembers();
+        } catch (error) {
+            console.error('Error updating board member:', error);
+            this.showError('Error updating board member. Please try again.');
+        }
+    }
+
+    async deleteBoardMember(id) {
+        if (!confirm('Are you sure you want to delete this board member?')) {
+            return;
+        }
+
+        try {
+            await deleteDoc(doc(db, 'boardMembers', id));
+            this.showSuccess('Board member deleted successfully!');
+            this.loadBoardMembers();
+        } catch (error) {
+            console.error('Error deleting board member:', error);
+            this.showError('Error deleting board member. Please try again.');
+        }
+    }
+
+    editBoardMember(id, member) {
+        this.editingBoardId = id;
+        
+        document.getElementById('memberName').value = member.name;
+        document.getElementById('memberPosition').value = member.position;
+        document.getElementById('memberBio').value = member.bio || '';
+        document.getElementById('memberEmail').value = member.email || '';
+        document.getElementById('memberPhone').value = member.phone || '';
+        document.getElementById('memberPhoto').value = member.photo || '';
+        document.getElementById('memberOrder').value = member.order || 999;
+        document.getElementById('memberActive').value = member.isActive.toString();
+
+        document.getElementById('cancelBoardEdit').style.display = 'inline-block';
+        document.querySelector('#boardForm button[type="submit"]').textContent = 'Update Member';
+
+        // Switch to board tab
+        document.querySelector('[data-tab="board"]').click();
+
+        // Scroll to form
+        document.querySelector('#boardTab .form-section').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    resetBoardForm() {
+        this.editingBoardId = null;
+        
+        document.getElementById('boardForm').reset();
+        document.getElementById('cancelBoardEdit').style.display = 'none';
+        document.querySelector('#boardForm button[type="submit"]').textContent = 'Add Member';
+    }
+
+    async loadBoardMembers() {
+        const boardList = document.getElementById('boardList');
+        
+        try {
+            const q = query(collection(db, 'boardMembers'), orderBy('order', 'asc'));
+            const querySnapshot = await getDocs(q);
+            
+            if (querySnapshot.empty) {
+                boardList.innerHTML = '<p class="loading">No board members found. Add your first board member above.</p>';
+                return;
+            }
+
+            let html = '';
+            querySnapshot.forEach((docSnap) => {
+                const member = docSnap.data();
+                const id = docSnap.id;
+                
+                html += `
+                    <div class="program-item">
+                        <div class="program-info">
+                            ${member.photo ? `
+                                <div style="width: 60px; height: 60px; border-radius: 10px; overflow: hidden; flex-shrink: 0;">
+                                    <img src="${member.photo}" alt="${member.name}" style="width: 100%; height: 100%; object-fit: cover;">
+                                </div>
+                            ` : `
+                                <div style="width: 60px; height: 60px; border-radius: 10px; background: #f0f0f0; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                                    <i class="fas fa-user" style="font-size: 24px; color: #999;"></i>
+                                </div>
+                            `}
+                            <div class="program-details">
+                                <h3>${member.name}</h3>
+                                <p style="font-weight: 600; color: #667eea;">${member.position}</p>
+                                ${member.bio ? `<p style="font-size: 14px; color: #666; margin-top: 5px;">${member.bio}</p>` : ''}
+                                ${member.email ? `<p style="font-size: 13px; color: #666;"><i class="fas fa-envelope"></i> ${member.email}</p>` : ''}
+                                ${member.phone ? `<p style="font-size: 13px; color: #666;"><i class="fas fa-phone"></i> ${member.phone}</p>` : ''}
+                                <p style="font-size: 14px; color: ${member.isActive ? '#48bb78' : '#e53e3e'}; margin-top: 5px;">
+                                    ${member.isActive ? '✓ Active' : '✗ Inactive'}
+                                </p>
+                                <p style="font-size: 12px; color: #999;">Display Order: ${member.order}</p>
+                            </div>
+                        </div>
+                        <div class="program-actions">
+                            <button class="btn btn-primary" onclick="admin.editBoardMember('${id}', ${JSON.stringify(member).replace(/"/g, '&quot;')})">
+                                Edit
+                            </button>
+                            <button class="btn btn-danger" onclick="admin.deleteBoardMember('${id}')">
+                                Delete
+                            </button>
+                        </div>
+                    </div>
+                `;
+            });
+
+            boardList.innerHTML = html;
+        } catch (error) {
+            console.error('Error loading board members:', error);
+            boardList.innerHTML = '<p class="loading">Error loading board members. Please refresh the page.</p>';
         }
     }
 }
