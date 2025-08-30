@@ -58,12 +58,12 @@
 <body>
     
     <!-- Announcement Popup Modal -->
-    <div id="announcementModal" style="display: none; position: fixed; inset: 0; z-index: 10000; animation: fadeIn 0.3s ease;">
+    <div id="announcementModal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 10000; animation: fadeIn 0.3s ease;">
         <!-- Backdrop -->
-        <div id="modalBackdrop" style="position: absolute; inset: 0; background: rgba(0, 0, 0, 0.5); backdrop-filter: blur(4px);"></div>
+        <div id="modalBackdrop" style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.5); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);"></div>
         
         <!-- Modal Content -->
-        <div id="modalContent" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; border-radius: 20px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); max-width: 500px; width: 90%; max-height: 80vh; overflow: hidden; animation: slideUp 0.3s ease;">
+        <div id="modalContent" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); -webkit-transform: translate(-50%, -50%); background: white; border-radius: 20px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); max-width: 500px; width: 90%; max-height: 80vh; overflow: hidden; animation: slideUp 0.3s ease; -webkit-animation: slideUp 0.3s ease;">
             <!-- Modal Header -->
             <div id="modalHeader" style="padding: 25px 25px 20px 25px; border-bottom: 1px solid #e0e0e0; position: relative;">
                 <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 10px;">
@@ -108,11 +108,27 @@
     </div>
 
     <style>
+        @-webkit-keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
         @keyframes fadeIn {
             from { opacity: 0; }
             to { opacity: 1; }
         }
         
+        @-webkit-keyframes slideUp {
+            from { 
+                opacity: 0;
+                -webkit-transform: translate(-50%, -40%);
+                transform: translate(-50%, -40%);
+            }
+            to { 
+                opacity: 1;
+                -webkit-transform: translate(-50%, -50%);
+                transform: translate(-50%, -50%);
+            }
+        }
         @keyframes slideUp {
             from { 
                 opacity: 0;
@@ -212,6 +228,51 @@
         .priority-low {
             background: #dbeafe;
             color: #2563eb;
+        }
+        
+        /* Mobile-specific styles */
+        @media (max-width: 768px) {
+            #modalContent {
+                width: 95% !important;
+                max-width: 95% !important;
+                max-height: 90vh !important;
+            }
+            
+            #modalHeader {
+                padding: 20px 20px 15px 20px !important;
+            }
+            
+            #announcementTitle {
+                font-size: 18px !important;
+            }
+            
+            #announcementMessage {
+                font-size: 14px !important;
+            }
+            
+            #floatingButton {
+                bottom: 20px !important;
+                right: 20px !important;
+            }
+            
+            #floatingButton button {
+                width: 56px !important;
+                height: 56px !important;
+                font-size: 22px !important;
+            }
+        }
+        
+        /* Very small mobile devices */
+        @media (max-width: 380px) {
+            #modalContent {
+                width: 98% !important;
+                border-radius: 15px !important;
+            }
+            
+            #modalHeader > div:last-child button {
+                width: 28px !important;
+                height: 28px !important;
+            }
         }
     </style>
     
