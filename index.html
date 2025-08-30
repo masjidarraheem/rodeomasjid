@@ -57,6 +57,19 @@
 </head>
 <body>
     
+    <!-- Announcement Banner -->
+    <div id="announcementBanner" style="display: none; position: fixed; top: 0; left: 0; right: 0; z-index: 10000; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 15px 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.2);">
+        <div style="max-width: 1200px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
+            <div style="flex: 1; min-width: 200px;">
+                <div id="announcementTitle" style="font-weight: 600; font-size: 16px; margin-bottom: 5px;"></div>
+                <div id="announcementMessage" style="font-size: 14px; opacity: 0.95;"></div>
+            </div>
+            <button onclick="closeAnnouncementBanner()" style="background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.3); color: white; padding: 8px 16px; border-radius: 5px; cursor: pointer; font-size: 14px; transition: background 0.3s;">
+                <span style="margin-right: 5px;">✕</span> Close
+            </button>
+        </div>
+    </div>
+    
     <!-- Navigation -->
     <nav class="navbar">
         <div class="nav-container">
@@ -444,6 +457,9 @@
     
     <!-- Dynamic Programs -->
     <script src="js/programs.js"></script>
+    
+    <!-- Dynamic Announcements -->
+    <script src="js/announcements.js"></script>
     
     <!-- Google Analytics -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-W77ZKV2WLL"></script>

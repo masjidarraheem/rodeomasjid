@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Masjid Programs Admin Panel</title>
+    <title>Masjid Admin Panel</title>
     <style>
         * {
             margin: 0;
@@ -216,6 +216,113 @@
             display: none;
         }
 
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        .tab-button {
+            padding: 12px 24px;
+            background: none;
+            border: none;
+            color: #666;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            position: relative;
+            transition: color 0.3s ease;
+        }
+
+        .tab-button:hover {
+            color: #667eea;
+        }
+
+        .tab-button.active {
+            color: #667eea;
+        }
+
+        .tab-button.active::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: #667eea;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .announcement-item {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            padding: 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            transition: border-color 0.3s ease;
+        }
+
+        .announcement-item:hover {
+            border-color: #667eea;
+        }
+
+        .announcement-info {
+            flex: 1;
+            margin-right: 20px;
+        }
+
+        .announcement-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+
+        .announcement-message {
+            color: #666;
+            margin-bottom: 10px;
+            line-height: 1.5;
+        }
+
+        .announcement-meta {
+            display: flex;
+            gap: 15px;
+            font-size: 14px;
+            color: #999;
+        }
+
+        .announcement-priority {
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .priority-high {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+
+        .priority-medium {
+            background: #fef3c7;
+            color: #d97706;
+        }
+
+        .priority-low {
+            background: #dbeafe;
+            color: #2563eb;
+        }
+
         @media (max-width: 768px) {
             .container {
                 margin: 10px;
@@ -270,8 +377,8 @@
     <!-- Admin Container -->
     <div id="adminContainer" class="container" style="display: none;">
         <div class="header">
-            <h1>🕌 Programs Admin Panel</h1>
-            <p>Manage Masjid Ar-Raheem Programs</p>
+            <h1>🕌 Admin Panel</h1>
+            <p>Manage Masjid Ar-Raheem</p>
             <div style="margin-top: 15px;">
                 <span id="userEmail" style="font-size: 14px; opacity: 0.8;"></span>
                 <button id="logoutBtn" class="btn" style="background: #e74c3c; color: white; margin-left: 15px; padding: 8px 16px; font-size: 14px;">Logout</button>
@@ -282,8 +389,16 @@
             <div id="successMessage" class="success-message"></div>
             <div id="errorMessage" class="error-message"></div>
 
-            <div class="form-section">
-                <h2>Add New Program</h2>
+            <!-- Tabs -->
+            <div class="tabs">
+                <button class="tab-button active" data-tab="programs">Programs</button>
+                <button class="tab-button" data-tab="announcements">Announcements</button>
+            </div>
+
+            <!-- Programs Tab -->
+            <div id="programsTab" class="tab-content active">
+                <div class="form-section">
+                    <h2>Add New Program</h2>
                 <form id="programForm">
                     <div class="form-group">
                         <label for="programName">Program Name</label>
@@ -345,9 +460,58 @@
                 </form>
             </div>
 
-            <div class="programs-list">
-                <h2>Current Programs</h2>
-                <div id="programsList" class="loading">Loading programs...</div>
+                <div class="programs-list">
+                    <h2>Current Programs</h2>
+                    <div id="programsList" class="loading">Loading programs...</div>
+                </div>
+            </div>
+
+            <!-- Announcements Tab -->
+            <div id="announcementsTab" class="tab-content">
+                <div class="form-section">
+                    <h2>Add New Announcement</h2>
+                    <form id="announcementForm">
+                        <div class="form-group">
+                            <label for="announcementTitle">Title</label>
+                            <input type="text" id="announcementTitle" required placeholder="e.g., Eid Prayer Timings">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="announcementMessage">Message</label>
+                            <textarea id="announcementMessage" required placeholder="Enter your announcement message..." style="width: 100%; padding: 15px; border: 2px solid #e0e0e0; border-radius: 10px; font-size: 16px; min-height: 120px; resize: vertical; font-family: inherit;"></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="announcementPriority">Priority</label>
+                            <select id="announcementPriority">
+                                <option value="low">Low (Blue)</option>
+                                <option value="medium" selected>Medium (Yellow)</option>
+                                <option value="high">High (Red)</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="announcementExpiry">Expiry Date (Optional)</label>
+                            <input type="datetime-local" id="announcementExpiry" style="width: 100%; padding: 15px; border: 2px solid #e0e0e0; border-radius: 10px; font-size: 16px;">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="announcementActive">Status</label>
+                            <select id="announcementActive">
+                                <option value="true">Active (Show on website)</option>
+                                <option value="false">Inactive (Hide from website)</option>
+                            </select>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary">Add Announcement</button>
+                        <button type="button" id="cancelAnnouncementEdit" class="btn" style="background: #ccc; display: none;">Cancel Edit</button>
+                    </form>
+                </div>
+
+                <div class="programs-list">
+                    <h2>Current Announcements</h2>
+                    <div id="announcementsList" class="loading">Loading announcements...</div>
+                </div>
             </div>
         </div>
     </div>
