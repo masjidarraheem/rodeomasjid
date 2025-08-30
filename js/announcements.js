@@ -116,7 +116,13 @@ class AnnouncementManager {
             
             // Set priority badge
             if (priorityBadge) {
-                priorityBadge.textContent = this.currentAnnouncement.priority || 'info';
+                // Map priority to display text
+                const priorityLabels = {
+                    low: 'NOTIFICATION',
+                    medium: 'ANNOUNCEMENT',
+                    high: 'EMERGENCY'
+                };
+                priorityBadge.textContent = priorityLabels[this.currentAnnouncement.priority] || 'NOTIFICATION';
                 priorityBadge.className = `priority-${this.currentAnnouncement.priority || 'low'}`;
                 priorityBadge.style.display = 'inline-block';
                 priorityBadge.style.padding = '3px 8px';
