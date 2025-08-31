@@ -71,18 +71,11 @@ class BoardWidget {
 
             let boardHtml = '';
             members.forEach((member) => {
-                boardHtml += `
-                    <li class="board-member-item">
-                        <div class="member-icon">
-                            <i class="fas fa-user"></i>
-                        </div>
-                        <div class="member-name">${member.name}</div>
-                    </li>
-                `;
+                boardHtml += `<li>${member.name}</li>`;
             });
 
             // Update the board list in the DOM
-            const boardList = document.querySelector('.board-list');
+            const boardList = document.getElementById('board-members-list');
             if (boardList) {
                 boardList.innerHTML = boardHtml;
             }
@@ -94,17 +87,16 @@ class BoardWidget {
     }
 
     showFallbackBoard() {
-        // Show a message if Firebase fails
+        // Show default board members if Firebase fails
         const fallbackHtml = `
-            <li class="board-member-item">
-                <div class="member-icon">
-                    <i class="fas fa-users"></i>
-                </div>
-                <div class="member-name">Board information coming soon</div>
-            </li>
+            <li>Haneef Abdul-Mu'min</li>
+            <li>Sh. Hamza Mehter</li>
+            <li>Hasib Khan</li>
+            <li>Fazal Rabbi</li>
+            <li>Moiz Qureshi</li>
         `;
 
-        const boardList = document.querySelector('.board-list');
+        const boardList = document.getElementById('board-members-list');
         if (boardList) {
             boardList.innerHTML = fallbackHtml;
         }

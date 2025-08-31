@@ -358,25 +358,6 @@
                         </ul>
                     </div>
                 </div>
-
-                <!-- Board of Directors Card -->
-                <div class="info-card card-board" id="board">
-                    <div class="card-icon">
-                        <i class="fas fa-users"></i>
-                    </div>
-                    <h3>Board of Directors</h3>
-                    <div class="board-content">
-                        <ul class="board-list">
-                            <!-- Board members loaded dynamically from Firebase -->
-                            <li class="board-member-item">
-                                <div class="member-icon">
-                                    <i class="fas fa-spinner fa-spin"></i>
-                                </div>
-                                <div class="member-name">Loading board members...</div>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
                 
                 <!-- Classes Card -->
                 <div class="info-card card-classes">
@@ -605,12 +586,9 @@
                 
                 <div class="contact-info">
                     <h3>Board of Directors</h3>
-                    <ul class="board-list">
-                        <li>Haneef Abdul-Mu'min</li>
-                        <li>Sh. Hamza Mehter</li>
-                        <li>Hasib Khan</li>
-                        <li>Fazal Rabbi</li>
-                        <li>Moiz Qureshi</li>
+                    <ul class="board-list" id="board-members-list">
+                        <!-- Board members loaded dynamically from Firebase -->
+                        <li><i class="fas fa-spinner fa-spin"></i> Loading board members...</li>
                     </ul>
                     <div class="contact-details">
                         <p><i class="fas fa-envelope"></i> <a href="mailto:board@rodeomasjid.org">board@rodeomasjid.org</a></p>
