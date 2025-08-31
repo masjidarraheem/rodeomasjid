@@ -103,19 +103,59 @@ class AdminPanel {
         tabButtons.forEach(button => {
             button.addEventListener('click', () => {
                 const targetTab = button.dataset.tab;
+                const isMobile = window.innerWidth <= 768;
+                const targetContent = document.getElementById(`${targetTab}Tab`);
                 
-                // Update active states
-                tabButtons.forEach(btn => btn.classList.remove('active'));
-                tabContents.forEach(content => content.classList.remove('active'));
-                
-                button.classList.add('active');
-                document.getElementById(`${targetTab}Tab`).classList.add('active');
+                // On mobile, check if clicking the already active tab
+                if (isMobile && button.classList.contains('active')) {
+                    // Toggle collapse/expand of active tab
+                    if (targetContent.style.display === 'none') {
+                        targetContent.style.display = 'block';
+                        targetContent.classList.add('active');
+                    } else {
+                        // Don't allow collapsing the only active tab - switch to another
+                        return;
+                    }
+                } else {
+                    // Normal tab switching behavior
+                    tabButtons.forEach(btn => btn.classList.remove('active'));
+                    tabContents.forEach(content => {
+                        content.classList.remove('active');
+                        if (isMobile) {
+                            content.style.display = 'none';
+                        }
+                    });
+                    
+                    button.classList.add('active');
+                    targetContent.classList.add('active');
+                    if (isMobile) {
+                        targetContent.style.display = 'block';
+                    }
+                }
                 
                 // Load board members when board tab is clicked
                 if (targetTab === 'board') {
                     this.loadBoardMembers();
                 }
+                
+                // Scroll to top of content on mobile
+                if (isMobile) {
+                    setTimeout(() => {
+                        targetContent.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                    }, 100);
+                }
             });
+        });
+        
+        // Handle window resize
+        window.addEventListener('resize', () => {
+            const isMobile = window.innerWidth <= 768;
+            if (!isMobile) {
+                // Reset display styles for desktop
+                tabContents.forEach(content => {
+                    content.style.display = '';
+                });
+            }
         });
     }
 

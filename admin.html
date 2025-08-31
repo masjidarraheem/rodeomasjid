@@ -375,6 +375,77 @@
             }
         }
 
+        /* Mobile expandable tabs */
+        @media (max-width: 768px) {
+            .tabs {
+                padding: 0;
+                flex-direction: column;
+                background: transparent;
+                gap: 0;
+                margin-bottom: 20px;
+            }
+            
+            .tab-button {
+                width: 100%;
+                padding: 16px 20px;
+                font-size: 15px;
+                border-radius: 8px;
+                margin-bottom: 5px;
+                text-align: left;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                background: #f8f9fa;
+                border: 1px solid #e0e0e0;
+            }
+            
+            .tab-button:after {
+                content: '▼';
+                font-size: 12px;
+                transition: transform 0.3s;
+                color: #999;
+            }
+            
+            .tab-button.active {
+                background: #667eea;
+                color: white;
+                font-weight: 600;
+                border-color: #667eea;
+            }
+            
+            .tab-button.active:after {
+                transform: rotate(180deg);
+                color: white;
+            }
+            
+            .tab-button:not(.active) {
+                cursor: pointer;
+            }
+            
+            /* Collapsed style for non-active tabs */
+            .tab-content {
+                display: none !important;
+            }
+            
+            .tab-content.active {
+                display: block !important;
+                animation: slideDown 0.3s ease;
+                margin-top: -5px;
+                padding-top: 0;
+            }
+            
+            @keyframes slideDown {
+                from {
+                    opacity: 0;
+                    transform: translateY(-10px);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+        }
+
         .tab-content {
             display: none;
         }
