@@ -37,6 +37,7 @@
     
     <!-- Modern CSS -->
     <link rel="stylesheet" href="css/modern-style.css">
+    <link rel="stylesheet" href="css/announcement-modal.css">
     
     <!-- Facebook Pixel Code -->
     <script>
@@ -58,31 +59,29 @@
 <body>
     
     <!-- Announcement Popup Modal -->
-    <div id="announcementModal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 10000; animation: fadeIn 0.3s ease;">
+    <div id="announcementModal">
         <!-- Backdrop -->
-        <div id="modalBackdrop" style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.5); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);"></div>
+        <div id="modalBackdrop"></div>
         
         <!-- Modal Content -->
-        <div id="modalContent" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); -webkit-transform: translate(-50%, -50%); background: white; border-radius: 20px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); max-width: 500px; width: 90%; max-height: 80vh; overflow: hidden; animation: slideUp 0.3s ease; -webkit-animation: slideUp 0.3s ease;">
+        <div id="modalContent">
             <!-- Modal Header -->
-            <div id="modalHeader" style="padding: 25px 25px 20px 25px; border-bottom: 1px solid #e0e0e0; position: relative;">
-                <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 10px;">
-                    <div id="announcementIcon" style="width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 20px;">
-                        📢
-                    </div>
+            <div id="modalHeader">
+                <div>
+                    <div id="announcementIcon">📢</div>
                     <div>
-                        <div id="announcementPriorityBadge" style="display: inline-block; padding: 3px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; text-transform: uppercase; margin-bottom: 5px;"></div>
-                        <div id="announcementTitle" style="font-size: 20px; font-weight: 700; color: #2c3e50;"></div>
+                        <div id="announcementPriorityBadge"></div>
+                        <div id="announcementTitle"></div>
                     </div>
                 </div>
                 <!-- Action buttons -->
-                <div style="position: absolute; top: 20px; right: 20px; display: flex; gap: 8px;">
-                    <button onclick="minimizeAnnouncement()" style="background: #f0f0f0; border: none; width: 32px; height: 32px; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s;" title="Minimize">
+                <div>
+                    <button onclick="minimizeAnnouncement()" title="Minimize">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <line x1="5" y1="12" x2="19" y2="12"></line>
                         </svg>
                     </button>
-                    <button onclick="closeAnnouncementModal()" style="background: #f0f0f0; border: none; width: 32px; height: 32px; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s;" title="Close">
+                    <button onclick="closeAnnouncementModal()" title="Close">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <line x1="18" y1="6" x2="6" y2="18"></line>
                             <line x1="6" y1="6" x2="18" y2="18"></line>
@@ -92,189 +91,21 @@
             </div>
             
             <!-- Modal Body -->
-            <div style="padding: 25px; overflow-y: auto; max-height: 400px;">
-                <div id="announcementMessage" style="font-size: 16px; line-height: 1.6; color: #4a5568;"></div>
-                <div id="announcementExpiry" style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #e0e0e0; font-size: 13px; color: #718096;"></div>
+            <div>
+                <div id="announcementMessage"></div>
+                <div id="announcementExpiry"></div>
             </div>
         </div>
     </div>
 
     <!-- Floating Announcement Button (Initially Hidden) -->
-    <div id="floatingButton" style="display: none; position: fixed; top: 80px; right: 20px; z-index: 9999; cursor: move; user-select: none;">
-        <button onclick="expandAnnouncement()" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none; width: 60px; height: 60px; border-radius: 50%; color: white; font-size: 24px; cursor: pointer; box-shadow: 0 4px 20px rgba(102, 126, 234, 0.4); transition: all 0.3s; position: relative; animation: pulse 2s infinite;">
-            <span style="position: relative;">📢</span>
-            <span id="notificationDot" style="position: absolute; top: 8px; right: 8px; width: 12px; height: 12px; background: #ff4444; border-radius: 50%; border: 2px solid white;"></span>
+    <div id="floatingButton">
+        <button onclick="expandAnnouncement()">
+            <span>📢</span>
+            <span id="notificationDot"></span>
         </button>
     </div>
 
-    <style>
-        @-webkit-keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-        
-        @-webkit-keyframes slideUp {
-            from { 
-                opacity: 0;
-                -webkit-transform: translate(-50%, -40%);
-                transform: translate(-50%, -40%);
-            }
-            to { 
-                opacity: 1;
-                -webkit-transform: translate(-50%, -50%);
-                transform: translate(-50%, -50%);
-            }
-        }
-        @keyframes slideUp {
-            from { 
-                opacity: 0;
-                transform: translate(-50%, -40%);
-            }
-            to { 
-                opacity: 1;
-                transform: translate(-50%, -50%);
-            }
-        }
-        
-        @keyframes minimizeToButton {
-            0% {
-                opacity: 1;
-                transform: translate(-50%, -50%) scale(1);
-            }
-            50% {
-                opacity: 0.8;
-                transform: translate(-50%, -50%) scale(0.3);
-            }
-            100% {
-                opacity: 0;
-                transform: translate(-50%, -50%) scale(0);
-            }
-        }
-        
-        @keyframes expandFromButton {
-            0% {
-                opacity: 0;
-                transform: translate(-50%, -50%) scale(0);
-            }
-            50% {
-                opacity: 0.8;
-                transform: translate(-50%, -50%) scale(0.3);
-            }
-            100% {
-                opacity: 1;
-                transform: translate(-50%, -50%) scale(1);
-            }
-        }
-        
-        @keyframes bounceIn {
-            0% {
-                opacity: 0;
-                transform: scale(0.3);
-            }
-            50% {
-                opacity: 1;
-                transform: scale(1.05);
-            }
-            70% {
-                transform: scale(0.9);
-            }
-            100% {
-                opacity: 1;
-                transform: scale(1);
-            }
-        }
-        
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-            100% { transform: scale(1); }
-        }
-        
-        .modal-minimizing #modalContent {
-            animation: minimizeToButton 0.5s ease-out forwards;
-        }
-        
-        .modal-expanding #modalContent {
-            animation: expandFromButton 0.5s ease-out forwards;
-        }
-        
-        .button-appearing {
-            animation: bounceIn 0.6s ease-out;
-        }
-        
-        #floatingButton button:hover {
-            transform: scale(1.1);
-            box-shadow: 0 6px 30px rgba(102, 126, 234, 0.5);
-        }
-        
-        #modalContent button:hover {
-            background: #e0e0e0 !important;
-        }
-        
-        .priority-high {
-            background: #fee2e2;
-            color: #dc2626;
-        }
-        
-        .priority-medium {
-            background: #fef3c7;
-            color: #d97706;
-        }
-        
-        .priority-low {
-            background: #dbeafe;
-            color: #2563eb;
-        }
-        
-        /* Mobile-specific styles */
-        @media (max-width: 768px) {
-            #modalContent {
-                width: 95% !important;
-                max-width: 95% !important;
-                max-height: 90vh !important;
-            }
-            
-            #modalHeader {
-                padding: 20px 20px 15px 20px !important;
-            }
-            
-            #announcementTitle {
-                font-size: 18px !important;
-            }
-            
-            #announcementMessage {
-                font-size: 14px !important;
-            }
-            
-            #floatingButton {
-                top: 70px !important;
-                right: 15px !important;
-            }
-            
-            #floatingButton button {
-                width: 50px !important;
-                height: 50px !important;
-                font-size: 20px !important;
-            }
-        }
-        
-        /* Very small mobile devices */
-        @media (max-width: 380px) {
-            #modalContent {
-                width: 98% !important;
-                border-radius: 15px !important;
-            }
-            
-            #modalHeader > div:last-child button {
-                width: 28px !important;
-                height: 28px !important;
-            }
-        }
-    </style>
     
     <!-- Navigation -->
     <nav class="navbar">
@@ -655,8 +486,8 @@
     <!-- Environment variables (generated at build time) -->
     <script src="js/env.js"></script>
     
-    <!-- Modern JavaScript -->
-    <script src="js/modern-app.js"></script>
+    <!-- Bundled & Minified JavaScript -->
+    <script src="js/app.bundle.js"></script>
     
     <!-- Dynamic Programs -->
     <script type="module" src="js/programs.js"></script>
