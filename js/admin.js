@@ -893,6 +893,7 @@ class AdminPanel {
             await addDoc(collection(db, 'boardMembers'), {
                 name: name,
                 order: order,
+                isActive: true,
                 createdAt: new Date(),
                 updatedAt: new Date()
             });
@@ -929,6 +930,7 @@ class AdminPanel {
             await updateDoc(memberRef, {
                 name: name,
                 order: order,
+                isActive: true,
                 updatedAt: new Date()
             });
 
@@ -1017,7 +1019,10 @@ class AdminPanel {
                         <div class="program-info">
                             <div class="program-details">
                                 <h3>${member.name}</h3>
-                                <p style="font-size: 12px; color: #999;">Display Order: ${member.order}</p>
+                                <p style="font-size: 12px; color: #999;">Display Order: ${member.order || 999}</p>
+                                <p style="font-size: 14px; color: ${member.isActive !== false ? '#48bb78' : '#e53e3e'};">
+                                    ${member.isActive !== false ? '✓ Active' : '✗ Inactive'}
+                                </p>
                             </div>
                         </div>
                         <div class="program-actions">
