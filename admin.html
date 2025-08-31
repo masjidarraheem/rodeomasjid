@@ -338,6 +338,45 @@
             background: #f8f9fa;
             padding: 8px;
             border-radius: 12px;
+            position: relative;
+        }
+
+        /* Menu toggle button - hidden on desktop */
+        .menu-toggle {
+            display: none;
+            width: 100%;
+            padding: 14px 20px;
+            background: white;
+            border: 2px solid #667eea;
+            color: #667eea;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .menu-toggle:hover {
+            background: #667eea;
+            color: white;
+        }
+
+        .menu-toggle-icon {
+            transition: transform 0.3s ease;
+            font-size: 14px;
+        }
+
+        .menu-toggle.expanded .menu-toggle-icon {
+            transform: rotate(180deg);
+        }
+
+        /* Container for tab buttons */
+        .tab-buttons-container {
+            display: flex;
+            gap: 15px;
+            flex: 1;
         }
 
         .tab-button {
@@ -375,7 +414,7 @@
             }
         }
 
-        /* Mobile expandable tabs */
+        /* Mobile collapsible menu */
         @media (max-width: 768px) {
             .tabs {
                 padding: 0;
@@ -385,25 +424,33 @@
                 margin-bottom: 20px;
             }
             
+            .menu-toggle {
+                display: flex;
+            }
+            
+            .tab-buttons-container {
+                display: none;
+                flex-direction: column;
+                gap: 5px;
+                margin-top: 10px;
+                padding: 10px;
+                background: #f8f9fa;
+                border-radius: 8px;
+                animation: slideDown 0.3s ease;
+            }
+            
+            .tab-buttons-container.expanded {
+                display: flex;
+            }
+            
             .tab-button {
                 width: 100%;
                 padding: 16px 20px;
                 font-size: 15px;
                 border-radius: 8px;
-                margin-bottom: 5px;
                 text-align: left;
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                background: #f8f9fa;
+                background: white;
                 border: 1px solid #e0e0e0;
-            }
-            
-            .tab-button:after {
-                content: '▼';
-                font-size: 12px;
-                transition: transform 0.3s;
-                color: #999;
             }
             
             .tab-button.active {
@@ -411,15 +458,6 @@
                 color: white;
                 font-weight: 600;
                 border-color: #667eea;
-            }
-            
-            .tab-button.active:after {
-                transform: rotate(180deg);
-                color: white;
-            }
-            
-            .tab-button:not(.active) {
-                cursor: pointer;
             }
             
             /* Collapsed style for non-active tabs */
@@ -870,9 +908,15 @@
 
             <!-- Tabs -->
             <div class="tabs">
-                <button class="tab-button active" data-tab="programs">Programs</button>
-                <button class="tab-button" data-tab="announcements">Announcements</button>
-                <button class="tab-button" data-tab="board">Board of Directors</button>
+                <button class="menu-toggle" id="menuToggle">
+                    <span class="menu-toggle-text">Programs</span>
+                    <span class="menu-toggle-icon">▼</span>
+                </button>
+                <div class="tab-buttons-container" id="tabButtonsContainer">
+                    <button class="tab-button active" data-tab="programs">Programs</button>
+                    <button class="tab-button" data-tab="announcements">Announcements</button>
+                    <button class="tab-button" data-tab="board">Board of Directors</button>
+                </div>
             </div>
 
             <!-- Programs Tab -->

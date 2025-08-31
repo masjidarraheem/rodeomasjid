@@ -99,11 +99,42 @@ class AdminPanel {
     setupTabs() {
         const tabButtons = document.querySelectorAll('.tab-button');
         const tabContents = document.querySelectorAll('.tab-content');
+        const menuToggle = document.getElementById('menuToggle');
+        const menuToggleText = menuToggle?.querySelector('.menu-toggle-text');
+        const tabButtonsContainer = document.getElementById('tabButtonsContainer');
         
         // Initialize: ensure only active tab is shown (CSS handles this, but clear any inline styles)
         tabContents.forEach(content => {
             content.style.display = ''; // Remove any inline display styles to let CSS handle it
         });
+
+        // Setup menu toggle for mobile
+        if (menuToggle) {
+            menuToggle.addEventListener('click', () => {
+                const isExpanded = tabButtonsContainer.classList.contains('expanded');
+                
+                if (isExpanded) {
+                    tabButtonsContainer.classList.remove('expanded');
+                    menuToggle.classList.remove('expanded');
+                } else {
+                    tabButtonsContainer.classList.add('expanded');
+                    menuToggle.classList.add('expanded');
+                }
+            });
+        }
+
+        // Update menu toggle text to show active tab
+        const updateMenuToggleText = () => {
+            if (menuToggleText) {
+                const activeButton = document.querySelector('.tab-button.active');
+                if (activeButton) {
+                    menuToggleText.textContent = activeButton.textContent;
+                }
+            }
+        };
+
+        // Initialize menu toggle text
+        updateMenuToggleText();
 
         tabButtons.forEach(button => {
             button.addEventListener('click', () => {
@@ -111,23 +142,26 @@ class AdminPanel {
                 const isMobile = window.innerWidth <= 768;
                 const targetContent = document.getElementById(`${targetTab}Tab`);
                 
-                // On mobile, check if clicking the already active tab
-                if (isMobile && button.classList.contains('active')) {
-                    // Don't allow collapsing the only active tab - just return
-                    return;
-                } else {
-                    // Normal tab switching behavior
-                    tabButtons.forEach(btn => btn.classList.remove('active'));
-                    tabContents.forEach(content => {
-                        content.classList.remove('active');
-                        // Remove inline styles to let CSS handle visibility
-                        content.style.display = '';
-                    });
-                    
-                    button.classList.add('active');
-                    targetContent.classList.add('active');
-                    // Remove inline style to let CSS handle visibility
-                    targetContent.style.display = '';
+                // Normal tab switching behavior
+                tabButtons.forEach(btn => btn.classList.remove('active'));
+                tabContents.forEach(content => {
+                    content.classList.remove('active');
+                    // Remove inline styles to let CSS handle visibility
+                    content.style.display = '';
+                });
+                
+                button.classList.add('active');
+                targetContent.classList.add('active');
+                // Remove inline style to let CSS handle visibility
+                targetContent.style.display = '';
+                
+                // Update menu toggle text
+                updateMenuToggleText();
+                
+                // On mobile, collapse the menu after selecting
+                if (isMobile && tabButtonsContainer) {
+                    tabButtonsContainer.classList.remove('expanded');
+                    menuToggle?.classList.remove('expanded');
                 }
                 
                 // Load board members when board tab is clicked
@@ -152,6 +186,11 @@ class AdminPanel {
                 tabContents.forEach(content => {
                     content.style.display = '';
                 });
+                // Hide menu on desktop
+                if (tabButtonsContainer) {
+                    tabButtonsContainer.classList.remove('expanded');
+                    menuToggle?.classList.remove('expanded');
+                }
             }
         });
     }
