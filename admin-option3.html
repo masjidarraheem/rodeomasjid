@@ -1,0 +1,891 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - Sidebar Navigation Design</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --sidebar-width: 260px;
+            --sidebar-collapsed: 60px;
+            --primary: #3b82f6;
+            --primary-dark: #2563eb;
+            --secondary: #8b5cf6;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --dark: #0f172a;
+            --gray-900: #1e293b;
+            --gray-700: #334155;
+            --gray-500: #64748b;
+            --gray-300: #cbd5e1;
+            --gray-100: #f1f5f9;
+            --white: #ffffff;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--gray-100);
+            color: var(--gray-900);
+            overflow-x: hidden;
+        }
+
+        /* Layout Container */
+        .app-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: var(--sidebar-width);
+            background: var(--dark);
+            transition: width 0.3s ease;
+            position: fixed;
+            height: 100vh;
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar.collapsed {
+            width: var(--sidebar-collapsed);
+        }
+
+        .sidebar-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .sidebar-logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            color: white;
+            font-size: 1.25rem;
+            font-weight: 700;
+        }
+
+        .sidebar.collapsed .sidebar-logo span {
+            display: none;
+        }
+
+        .sidebar-toggle {
+            background: none;
+            border: none;
+            color: white;
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 0.375rem;
+            transition: background 0.2s;
+        }
+
+        .sidebar-toggle:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .sidebar-nav {
+            flex: 1;
+            padding: 1rem 0;
+            overflow-y: auto;
+        }
+
+        .nav-item {
+            display: block;
+            width: 100%;
+            padding: 0.875rem 1.5rem;
+            color: var(--gray-300);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            transition: all 0.2s;
+            position: relative;
+            border: none;
+            background: none;
+            cursor: pointer;
+            font-size: 0.875rem;
+        }
+
+        .nav-item:hover {
+            background: rgba(255, 255, 255, 0.05);
+            color: white;
+        }
+
+        .nav-item.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        .nav-item.active::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 3px;
+            background: white;
+        }
+
+        .nav-item i {
+            width: 20px;
+            text-align: center;
+        }
+
+        .sidebar.collapsed .nav-item span {
+            display: none;
+        }
+
+        .sidebar.collapsed .nav-item {
+            padding: 0.875rem;
+            justify-content: center;
+        }
+
+        .sidebar-footer {
+            padding: 1rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            color: white;
+            padding: 0.75rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 0.5rem;
+        }
+
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            background: var(--primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.875rem;
+            font-weight: 600;
+        }
+
+        .sidebar.collapsed .user-info span {
+            display: none;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            margin-left: var(--sidebar-width);
+            transition: margin-left 0.3s ease;
+        }
+
+        .sidebar.collapsed + .main-content {
+            margin-left: var(--sidebar-collapsed);
+        }
+
+        /* Top Header */
+        .top-header {
+            background: white;
+            padding: 1rem 2rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 50;
+        }
+
+        .page-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--gray-900);
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 1rem;
+        }
+
+        /* Page Content */
+        .page-content {
+            padding: 2rem;
+        }
+
+        /* Quick Stats */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-box {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .stat-icon {
+            width: 3.5rem;
+            height: 3.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 0.75rem;
+            font-size: 1.5rem;
+        }
+
+        .stat-icon.blue {
+            background: rgba(59, 130, 246, 0.1);
+            color: var(--primary);
+        }
+
+        .stat-icon.green {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--success);
+        }
+
+        .stat-icon.purple {
+            background: rgba(139, 92, 246, 0.1);
+            color: var(--secondary);
+        }
+
+        .stat-icon.yellow {
+            background: rgba(245, 158, 11, 0.1);
+            color: var(--warning);
+        }
+
+        .stat-details h3 {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--gray-900);
+        }
+
+        .stat-details p {
+            font-size: 0.875rem;
+            color: var(--gray-500);
+        }
+
+        /* Content Grid */
+        .content-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 2rem;
+        }
+
+        @media (min-width: 1024px) {
+            .content-grid {
+                grid-template-columns: 1fr 2fr;
+            }
+        }
+
+        /* Panel */
+        .panel {
+            background: white;
+            border-radius: 0.75rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .panel-header {
+            padding: 1.25rem 1.5rem;
+            border-bottom: 1px solid var(--gray-100);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .panel-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--gray-900);
+        }
+
+        .panel-body {
+            padding: 1.5rem;
+        }
+
+        /* Form Elements */
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--gray-700);
+            margin-bottom: 0.5rem;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.625rem 0.875rem;
+            border: 1px solid var(--gray-300);
+            border-radius: 0.5rem;
+            font-size: 0.875rem;
+            transition: all 0.2s;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        /* Icon Picker */
+        .icon-picker {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(45px, 1fr));
+            gap: 0.5rem;
+        }
+
+        .icon-box {
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid var(--gray-300);
+            border-radius: 0.375rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .icon-box:hover {
+            border-color: var(--primary);
+            background: var(--gray-100);
+        }
+
+        .icon-box.active {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: white;
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 0.625rem 1.25rem;
+            border: none;
+            border-radius: 0.5rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+        }
+
+        .btn-outline {
+            background: white;
+            color: var(--gray-700);
+            border: 1px solid var(--gray-300);
+        }
+
+        .btn-outline:hover {
+            background: var(--gray-100);
+        }
+
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+        }
+
+        .btn-sm {
+            padding: 0.375rem 0.75rem;
+            font-size: 0.75rem;
+        }
+
+        /* Table List */
+        .table-container {
+            overflow-x: auto;
+        }
+
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .table th {
+            text-align: left;
+            padding: 0.75rem;
+            background: var(--gray-100);
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: var(--gray-700);
+            border-bottom: 1px solid var(--gray-300);
+        }
+
+        .table td {
+            padding: 1rem 0.75rem;
+            border-bottom: 1px solid var(--gray-100);
+        }
+
+        .table tr:hover {
+            background: var(--gray-100);
+        }
+
+        .table-icon {
+            width: 2rem;
+            height: 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--primary);
+            color: white;
+            border-radius: 0.375rem;
+        }
+
+        /* Badge */
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.25rem 0.625rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .badge-success {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--success);
+        }
+
+        .badge-warning {
+            background: rgba(245, 158, 11, 0.1);
+            color: var(--warning);
+        }
+
+        /* Mobile Menu */
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--gray-700);
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+
+            .sidebar.open {
+                transform: translateX(0);
+            }
+
+            .main-content {
+                margin-left: 0 !important;
+            }
+
+            .mobile-menu-btn {
+                display: block;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .content-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .page-content {
+                padding: 1rem;
+            }
+
+            .top-header {
+                padding: 1rem;
+            }
+
+            .page-title {
+                font-size: 1.25rem;
+            }
+        }
+
+        /* Overlay for mobile */
+        .overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 99;
+        }
+
+        .overlay.active {
+            display: block;
+        }
+
+        /* Loading */
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 3rem;
+            color: var(--gray-500);
+        }
+
+        .spinner {
+            width: 2rem;
+            height: 2rem;
+            border: 3px solid var(--gray-300);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-logo">
+                    <i class="fas fa-mosque"></i>
+                    <span>Admin Panel</span>
+                </div>
+                <button class="sidebar-toggle" id="sidebarToggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+
+            <nav class="sidebar-nav">
+                <button class="nav-item active">
+                    <i class="fas fa-home"></i>
+                    <span>Dashboard</span>
+                </button>
+                <button class="nav-item">
+                    <i class="fas fa-calendar-alt"></i>
+                    <span>Programs</span>
+                </button>
+                <button class="nav-item">
+                    <i class="fas fa-bullhorn"></i>
+                    <span>Announcements</span>
+                </button>
+                <button class="nav-item">
+                    <i class="fas fa-users"></i>
+                    <span>Board Members</span>
+                </button>
+                <button class="nav-item">
+                    <i class="fas fa-chart-bar"></i>
+                    <span>Analytics</span>
+                </button>
+                <button class="nav-item">
+                    <i class="fas fa-envelope"></i>
+                    <span>Messages</span>
+                </button>
+                <button class="nav-item">
+                    <i class="fas fa-cog"></i>
+                    <span>Settings</span>
+                </button>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="user-info">
+                    <div class="user-avatar">A</div>
+                    <span>
+                        <div style="font-size: 0.875rem;">Admin</div>
+                        <div style="font-size: 0.75rem; opacity: 0.7;">admin@rodeomasjid.org</div>
+                    </span>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Top Header -->
+            <header class="top-header">
+                <div style="display: flex; align-items: center; gap: 1rem;">
+                    <button class="mobile-menu-btn" id="mobileMenuBtn">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <h1 class="page-title">Dashboard</h1>
+                </div>
+                <div class="header-actions">
+                    <button class="btn btn-outline btn-sm">
+                        <i class="fas fa-bell"></i>
+                    </button>
+                    <button class="btn btn-primary btn-sm">
+                        <i class="fas fa-plus"></i> Add New
+                    </button>
+                </div>
+            </header>
+
+            <!-- Page Content -->
+            <div class="page-content">
+                <!-- Quick Stats -->
+                <div class="stats-grid">
+                    <div class="stat-box">
+                        <div class="stat-icon blue">
+                            <i class="fas fa-calendar-alt"></i>
+                        </div>
+                        <div class="stat-details">
+                            <h3>15</h3>
+                            <p>Total Programs</p>
+                        </div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-icon green">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <div class="stat-details">
+                            <h3>12</h3>
+                            <p>Active Programs</p>
+                        </div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-icon purple">
+                            <i class="fas fa-bullhorn"></i>
+                        </div>
+                        <div class="stat-details">
+                            <h3>4</h3>
+                            <p>Announcements</p>
+                        </div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-icon yellow">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div class="stat-details">
+                            <h3>8</h3>
+                            <p>Board Members</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Content Grid -->
+                <div class="content-grid">
+                    <!-- Form Panel -->
+                    <div class="panel">
+                        <div class="panel-header">
+                            <h2 class="panel-title">Add New Program</h2>
+                        </div>
+                        <div class="panel-body">
+                            <form>
+                                <div class="form-group">
+                                    <label class="form-label">Program Name</label>
+                                    <input type="text" class="form-control" placeholder="Enter program name">
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="form-label">Schedule</label>
+                                    <input type="text" class="form-control" placeholder="e.g., Every Friday after Maghrib">
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="form-label">Select Icon</label>
+                                    <div class="icon-picker">
+                                        <div class="icon-box" data-icon="book-quran">
+                                            <i class="fas fa-book-quran"></i>
+                                        </div>
+                                        <div class="icon-box" data-icon="mosque">
+                                            <i class="fas fa-mosque"></i>
+                                        </div>
+                                        <div class="icon-box" data-icon="hands-praying">
+                                            <i class="fas fa-hands-praying"></i>
+                                        </div>
+                                        <div class="icon-box" data-icon="users">
+                                            <i class="fas fa-users"></i>
+                                        </div>
+                                        <div class="icon-box" data-icon="graduation-cap">
+                                            <i class="fas fa-graduation-cap"></i>
+                                        </div>
+                                        <div class="icon-box" data-icon="heart">
+                                            <i class="fas fa-heart"></i>
+                                        </div>
+                                        <div class="icon-box" data-icon="star">
+                                            <i class="fas fa-star"></i>
+                                        </div>
+                                        <div class="icon-box" data-icon="calendar">
+                                            <i class="fas fa-calendar"></i>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="form-label">Status</label>
+                                    <select class="form-control">
+                                        <option>Active</option>
+                                        <option>Inactive</option>
+                                    </select>
+                                </div>
+
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-save"></i> Save Program
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- Table Panel -->
+                    <div class="panel">
+                        <div class="panel-header">
+                            <h2 class="panel-title">Current Programs</h2>
+                            <button class="btn btn-outline btn-sm">
+                                <i class="fas fa-filter"></i> Filter
+                            </button>
+                        </div>
+                        <div class="panel-body" style="padding: 0;">
+                            <div class="table-container">
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th>Icon</th>
+                                            <th>Program</th>
+                                            <th>Schedule</th>
+                                            <th>Status</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>
+                                                <div class="table-icon">
+                                                    <i class="fas fa-book-quran"></i>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <strong>Quran Study</strong>
+                                            </td>
+                                            <td>Daily after Fajr</td>
+                                            <td>
+                                                <span class="badge badge-success">Active</span>
+                                            </td>
+                                            <td>
+                                                <button class="btn btn-outline btn-sm">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+                                                <button class="btn btn-danger btn-sm">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <div class="table-icon">
+                                                    <i class="fas fa-graduation-cap"></i>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <strong>Youth Class</strong>
+                                            </td>
+                                            <td>Saturdays 3 PM</td>
+                                            <td>
+                                                <span class="badge badge-success">Active</span>
+                                            </td>
+                                            <td>
+                                                <button class="btn btn-outline btn-sm">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+                                                <button class="btn btn-danger btn-sm">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <div class="table-icon">
+                                                    <i class="fas fa-users"></i>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <strong>Community Iftar</strong>
+                                            </td>
+                                            <td>During Ramadan</td>
+                                            <td>
+                                                <span class="badge badge-warning">Seasonal</span>
+                                            </td>
+                                            <td>
+                                                <button class="btn btn-outline btn-sm">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+                                                <button class="btn btn-danger btn-sm">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Mobile Overlay -->
+        <div class="overlay" id="overlay"></div>
+    </div>
+
+    <script>
+        // Sidebar Toggle
+        const sidebar = document.getElementById('sidebar');
+        const sidebarToggle = document.getElementById('sidebarToggle');
+        const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+        const overlay = document.getElementById('overlay');
+
+        sidebarToggle.addEventListener('click', () => {
+            sidebar.classList.toggle('collapsed');
+        });
+
+        mobileMenuBtn.addEventListener('click', () => {
+            sidebar.classList.add('open');
+            overlay.classList.add('active');
+        });
+
+        overlay.addEventListener('click', () => {
+            sidebar.classList.remove('open');
+            overlay.classList.remove('active');
+        });
+
+        // Navigation
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', () => {
+                document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+                item.classList.add('active');
+            });
+        });
+
+        // Icon Selection
+        document.querySelectorAll('.icon-box').forEach(box => {
+            box.addEventListener('click', () => {
+                document.querySelectorAll('.icon-box').forEach(b => b.classList.remove('active'));
+                box.classList.add('active');
+            });
+        });
+    </script>
+</body>
+</html>
