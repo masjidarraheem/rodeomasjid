@@ -358,6 +358,25 @@
                         </ul>
                     </div>
                 </div>
+
+                <!-- Board of Directors Card -->
+                <div class="info-card card-board" id="board">
+                    <div class="card-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <h3>Board of Directors</h3>
+                    <div class="board-content">
+                        <ul class="board-list">
+                            <!-- Board members loaded dynamically from Firebase -->
+                            <li class="board-member-item">
+                                <div class="member-icon">
+                                    <i class="fas fa-spinner fa-spin"></i>
+                                </div>
+                                <div class="member-name">Loading board members...</div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
                 
                 <!-- Classes Card -->
                 <div class="info-card card-classes">
@@ -663,6 +682,9 @@
     
     <!-- Dynamic Programs -->
     <script type="module" src="js/programs.js"></script>
+    
+    <!-- Dynamic Board Members -->
+    <script type="module" src="js/board.js"></script>
     
     <!-- Dynamic Announcements -->
     <script type="module" src="js/announcements.js"></script>

@@ -1324,6 +1324,43 @@ a:hover {
     }
 }
 
+/* Board Members Styles */
+.board-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.board-member-item {
+    padding: 12px 0;
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.board-member-item:last-child {
+    border-bottom: none;
+}
+
+.member-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    background: var(--primary-color);
+    color: white;
+    border-radius: 50%;
+    font-size: 0.9rem;
+}
+
+.member-name {
+    font-weight: 500;
+    color: var(--text-primary);
+    font-size: 0.95rem;
+}
+
 /* Print Styles */
 @media print {
     .navbar,
