@@ -1015,9 +1015,6 @@ class AdminPanel {
                 html += `
                     <div class="program-item">
                         <div class="program-info">
-                            <div style="width: 60px; height: 60px; border-radius: 10px; background: #f0f0f0; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
-                                <i class="fas fa-user" style="font-size: 24px; color: #999;"></i>
-                            </div>
                             <div class="program-details">
                                 <h3>${member.name}</h3>
                                 <p style="font-size: 12px; color: #999;">Display Order: ${member.order}</p>
