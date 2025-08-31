@@ -27,6 +27,20 @@
             overflow: hidden;
         }
 
+        /* Mobile: Full screen without gradient */
+        @media (max-width: 768px) {
+            body {
+                background: white;
+                padding: 0;
+            }
+
+            .container {
+                max-width: 100%;
+                border-radius: 0;
+                box-shadow: none;
+            }
+        }
+
         .header {
             background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
             color: white;
@@ -61,6 +75,12 @@
         @media (min-width: 768px) {
             .content {
                 padding: 50px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .content {
+                padding: 15px;
             }
         }
 
@@ -576,13 +596,7 @@
         }
 
         @media (max-width: 768px) {
-            body {
-                padding: 10px;
-            }
-
-            .container {
-                border-radius: 15px;
-            }
+            /* Body and container styles are set in the earlier media query */
             
             .header {
                 padding: 30px 20px;
