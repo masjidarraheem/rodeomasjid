@@ -99,6 +99,11 @@ class AdminPanel {
     setupTabs() {
         const tabButtons = document.querySelectorAll('.tab-button');
         const tabContents = document.querySelectorAll('.tab-content');
+        
+        // Initialize: ensure only active tab is shown (CSS handles this, but clear any inline styles)
+        tabContents.forEach(content => {
+            content.style.display = ''; // Remove any inline display styles to let CSS handle it
+        });
 
         tabButtons.forEach(button => {
             button.addEventListener('click', () => {
@@ -108,29 +113,21 @@ class AdminPanel {
                 
                 // On mobile, check if clicking the already active tab
                 if (isMobile && button.classList.contains('active')) {
-                    // Toggle collapse/expand of active tab
-                    if (targetContent.style.display === 'none') {
-                        targetContent.style.display = 'block';
-                        targetContent.classList.add('active');
-                    } else {
-                        // Don't allow collapsing the only active tab - switch to another
-                        return;
-                    }
+                    // Don't allow collapsing the only active tab - just return
+                    return;
                 } else {
                     // Normal tab switching behavior
                     tabButtons.forEach(btn => btn.classList.remove('active'));
                     tabContents.forEach(content => {
                         content.classList.remove('active');
-                        if (isMobile) {
-                            content.style.display = 'none';
-                        }
+                        // Remove inline styles to let CSS handle visibility
+                        content.style.display = '';
                     });
                     
                     button.classList.add('active');
                     targetContent.classList.add('active');
-                    if (isMobile) {
-                        targetContent.style.display = 'block';
-                    }
+                    // Remove inline style to let CSS handle visibility
+                    targetContent.style.display = '';
                 }
                 
                 // Load board members when board tab is clicked
