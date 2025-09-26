@@ -748,6 +748,9 @@
         <span id="successText">Action completed successfully!</span>
     </div>
 
+    <!-- Firebase Environment Config -->
+    <script src="env.js"></script>
+
     <!-- Scripts -->
     <script type="module">
         // Import Firebase modules (using your existing config)
@@ -755,12 +758,18 @@
         import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
         import { getFirestore, collection, addDoc, getDocs, query, orderBy, limit, where, Timestamp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 
-        // Initialize Firebase (use your existing config)
-        const firebaseConfig = window.ENV || {
-            apiKey: "demo-key",
-            authDomain: "demo.firebaseapp.com",
-            projectId: "demo-project"
+        // Initialize Firebase (use the same config as admin panel)
+        const firebaseConfig = {
+            apiKey: window.ENV?.FIREBASE_API_KEY || "your-api-key",
+            authDomain: window.ENV?.FIREBASE_AUTH_DOMAIN || "your-project.firebaseapp.com",
+            projectId: window.ENV?.FIREBASE_PROJECT_ID || "your-project-id",
+            storageBucket: window.ENV?.FIREBASE_STORAGE_BUCKET || "your-project.appspot.com",
+            messagingSenderId: window.ENV?.FIREBASE_MESSAGING_SENDER_ID || "123456789",
+            appId: window.ENV?.FIREBASE_APP_ID || "your-app-id"
         };
+
+        console.log('Firebase config loaded:', firebaseConfig);
+        console.log('Window ENV:', window.ENV);
 
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
@@ -840,15 +849,35 @@
                 const loginText = document.querySelector('.login-text');
                 const loading = document.querySelector('.loading');
 
+                console.log('Attempting login with email:', email);
+                console.log('Firebase auth object:', auth);
+
                 loginText.style.display = 'none';
                 loading.style.display = 'flex';
                 loginBtn.disabled = true;
 
                 try {
-                    await signInWithEmailAndPassword(auth, email, password);
+                    const userCredential = await signInWithEmailAndPassword(auth, email, password);
+                    console.log('Login successful:', userCredential);
                 } catch (error) {
-                    console.error('Login error:', error);
-                    this.showError('Invalid email or password');
+                    console.error('Login error details:', error);
+                    console.error('Error code:', error.code);
+                    console.error('Error message:', error.message);
+
+                    let errorMessage = 'Login failed';
+                    if (error.code === 'auth/user-not-found') {
+                        errorMessage = 'No account found with this email';
+                    } else if (error.code === 'auth/wrong-password') {
+                        errorMessage = 'Incorrect password';
+                    } else if (error.code === 'auth/invalid-email') {
+                        errorMessage = 'Invalid email address';
+                    } else if (error.code === 'auth/invalid-credential') {
+                        errorMessage = 'Invalid email or password';
+                    } else {
+                        errorMessage = error.message;
+                    }
+
+                    this.showError(errorMessage);
 
                     loginText.style.display = 'block';
                     loading.style.display = 'none';
