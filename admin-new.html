@@ -1,0 +1,1149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Masjid Admin - Community Management</title>
+
+    <!-- PWA Meta Tags -->
+    <meta name="theme-color" content="#2563eb">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Masjid Admin">
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --primary-light: #3b82f6;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --gray-50: #f9fafb;
+            --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb;
+            --gray-300: #d1d5db;
+            --gray-400: #9ca3af;
+            --gray-500: #6b7280;
+            --gray-600: #4b5563;
+            --gray-700: #374151;
+            --gray-800: #1f2937;
+            --gray-900: #111827;
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+            --border-radius: 12px;
+            --font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-family);
+            background: var(--gray-50);
+            color: var(--gray-900);
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        /* Mobile App Layout */
+        .app-container {
+            max-width: 428px;
+            margin: 0 auto;
+            min-height: 100vh;
+            background: white;
+            position: relative;
+            box-shadow: 0 0 0 1px var(--gray-200);
+        }
+
+        /* Status Bar Spacer */
+        .status-bar {
+            height: env(safe-area-inset-top, 20px);
+            background: var(--primary);
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            padding: 16px 20px 24px 20px;
+            position: relative;
+            border-radius: 0 0 24px 24px;
+        }
+
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .header-title {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .welcome-message {
+            font-size: 14px;
+            opacity: 0.9;
+            margin-bottom: 8px;
+        }
+
+        .community-stats {
+            display: flex;
+            gap: 16px;
+            margin-top: 12px;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 20px;
+            font-weight: 700;
+            display: block;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            opacity: 0.8;
+        }
+
+        /* Quick Actions Dashboard */
+        .dashboard {
+            padding: 20px;
+        }
+
+        .section-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--gray-900);
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .priority-alerts {
+            margin-bottom: 24px;
+        }
+
+        .alert-card {
+            background: white;
+            border: 1px solid var(--gray-200);
+            border-radius: var(--border-radius);
+            padding: 16px;
+            margin-bottom: 8px;
+            box-shadow: var(--shadow-sm);
+            position: relative;
+        }
+
+        .alert-card.urgent {
+            border-left: 4px solid var(--danger);
+        }
+
+        .alert-card.info {
+            border-left: 4px solid var(--primary);
+        }
+
+        .alert-header {
+            display: flex;
+            justify-content: between;
+            align-items: flex-start;
+            margin-bottom: 8px;
+        }
+
+        .alert-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--gray-900);
+            flex: 1;
+        }
+
+        .alert-time {
+            font-size: 12px;
+            color: var(--gray-500);
+        }
+
+        .alert-message {
+            font-size: 13px;
+            color: var(--gray-600);
+            line-height: 1.4;
+        }
+
+        /* Quick Actions Grid */
+        .quick-actions {
+            margin-bottom: 32px;
+        }
+
+        .actions-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .action-card {
+            background: white;
+            border: 1px solid var(--gray-200);
+            border-radius: var(--border-radius);
+            padding: 20px 16px;
+            text-align: center;
+            text-decoration: none;
+            color: var(--gray-700);
+            transition: all 0.2s ease;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .action-card:hover, .action-card:active {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+            border-color: var(--primary);
+        }
+
+        .action-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, var(--primary-light), var(--primary));
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            margin: 0 auto 12px auto;
+        }
+
+        .action-title {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .action-subtitle {
+            font-size: 12px;
+            color: var(--gray-500);
+        }
+
+        /* Recent Activity */
+        .recent-activity {
+            margin-bottom: 100px;
+        }
+
+        .activity-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--gray-100);
+        }
+
+        .activity-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            background: var(--gray-100);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 12px;
+            font-size: 14px;
+            color: var(--gray-600);
+        }
+
+        .activity-content {
+            flex: 1;
+        }
+
+        .activity-title {
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--gray-900);
+        }
+
+        .activity-time {
+            font-size: 12px;
+            color: var(--gray-500);
+        }
+
+        /* Bottom Navigation */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            max-width: 428px;
+            background: white;
+            border-top: 1px solid var(--gray-200);
+            padding: 8px 0 calc(8px + env(safe-area-inset-bottom, 0px));
+            z-index: 100;
+        }
+
+        .nav-items {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 8px 12px;
+            text-decoration: none;
+            color: var(--gray-500);
+            font-size: 12px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            border-radius: 8px;
+            min-width: 60px;
+        }
+
+        .nav-item.active {
+            color: var(--primary);
+            background: rgba(37, 99, 235, 0.1);
+        }
+
+        .nav-item i {
+            font-size: 18px;
+            margin-bottom: 4px;
+        }
+
+        /* Login Screen */
+        .login-container {
+            display: none;
+            padding: 40px 20px;
+            text-align: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+        }
+
+        .login-form {
+            background: white;
+            border-radius: 24px;
+            padding: 32px 24px;
+            margin-top: 80px;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .logo {
+            width: 64px;
+            height: 64px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            border-radius: 16px;
+            margin: 0 auto 24px auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: white;
+        }
+
+        .login-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--gray-900);
+            margin-bottom: 8px;
+        }
+
+        .login-subtitle {
+            font-size: 14px;
+            color: var(--gray-600);
+            margin-bottom: 32px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--gray-700);
+            margin-bottom: 6px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid var(--gray-200);
+            border-radius: var(--border-radius);
+            font-size: 16px;
+            transition: border-color 0.2s ease;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .btn {
+            width: 100%;
+            padding: 16px;
+            border: none;
+            border-radius: var(--border-radius);
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-md);
+        }
+
+        /* Modal Overlays */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            display: none;
+            align-items: flex-end;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 24px 24px 0 0;
+            padding: 24px;
+            width: 100%;
+            max-width: 428px;
+            max-height: 80vh;
+            overflow-y: auto;
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(100%); }
+            to { transform: translateY(0); }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--gray-200);
+        }
+
+        .modal-title {
+            font-size: 18px;
+            font-weight: 600;
+            flex: 1;
+        }
+
+        .close-btn {
+            width: 32px;
+            height: 32px;
+            border: none;
+            background: var(--gray-100);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: var(--gray-600);
+        }
+
+        /* Animations */
+        .fade-in {
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Success Messages */
+        .success-message {
+            background: var(--success);
+            color: white;
+            padding: 12px 20px;
+            border-radius: var(--border-radius);
+            margin-bottom: 16px;
+            font-size: 14px;
+            display: none;
+        }
+
+        /* Loading States */
+        .loading {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--gray-500);
+            font-size: 14px;
+        }
+
+        .spinner {
+            width: 16px;
+            height: 16px;
+            border: 2px solid var(--gray-300);
+            border-top: 2px solid var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 375px) {
+            .dashboard {
+                padding: 16px;
+            }
+
+            .actions-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .community-stats {
+                justify-content: center;
+            }
+        }
+
+        /* Dark Mode Support */
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --gray-50: #111827;
+                --gray-100: #1f2937;
+                --gray-200: #374151;
+                --gray-300: #4b5563;
+                --gray-400: #6b7280;
+                --gray-500: #9ca3af;
+                --gray-600: #d1d5db;
+                --gray-700: #e5e7eb;
+                --gray-800: #f3f4f6;
+                --gray-900: #f9fafb;
+            }
+
+            body {
+                background: var(--gray-50);
+            }
+
+            .app-container {
+                background: var(--gray-100);
+            }
+        }
+
+        /* iOS Safe Area Support */
+        @supports (padding: max(0px)) {
+            .header {
+                padding-top: max(16px, env(safe-area-inset-top));
+            }
+
+            .bottom-nav {
+                padding-bottom: max(8px, env(safe-area-inset-bottom));
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Login Screen -->
+    <div id="loginContainer" class="login-container">
+        <div class="login-form fade-in">
+            <div class="logo">
+                <i class="fas fa-mosque"></i>
+            </div>
+            <h1 class="login-title">Welcome Back</h1>
+            <p class="login-subtitle">Sign in to manage your masjid community</p>
+
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="email">Email Address</label>
+                    <input type="email" id="email" class="form-input" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" class="form-input" required>
+                </div>
+                <button type="submit" class="btn btn-primary">
+                    <span class="login-text">Sign In</span>
+                    <span class="loading" style="display: none;">
+                        <div class="spinner"></div>
+                        Signing in...
+                    </span>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Main App -->
+    <div id="appContainer" class="app-container" style="display: none;">
+        <div class="status-bar"></div>
+
+        <!-- Header -->
+        <div class="header">
+            <div class="header-top">
+                <h1 class="header-title">Community Dashboard</h1>
+                <div class="user-avatar" id="userAvatar">MB</div>
+            </div>
+            <p class="welcome-message">Good <span id="timeOfDay">morning</span>, <span id="userName">Board Member</span></p>
+            <div class="community-stats">
+                <div class="stat-item">
+                    <span class="stat-number" id="activePrograms">-</span>
+                    <span class="stat-label">Active Programs</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number" id="recentAnnouncements">-</span>
+                    <span class="stat-label">Announcements</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number" id="boardMembers">-</span>
+                    <span class="stat-label">Board Members</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Dashboard Content -->
+        <div class="dashboard">
+            <!-- Priority Alerts -->
+            <section class="priority-alerts">
+                <h2 class="section-title">
+                    <i class="fas fa-bell"></i>
+                    Needs Your Attention
+                </h2>
+                <div id="alertsList">
+                    <!-- Dynamic alerts will be inserted here -->
+                </div>
+            </section>
+
+            <!-- Quick Actions -->
+            <section class="quick-actions">
+                <h2 class="section-title">
+                    <i class="fas fa-zap"></i>
+                    Quick Actions
+                </h2>
+                <div class="actions-grid">
+                    <a href="#" class="action-card" data-action="new-announcement">
+                        <div class="action-icon">
+                            <i class="fas fa-bullhorn"></i>
+                        </div>
+                        <div class="action-title">New Announcement</div>
+                        <div class="action-subtitle">Share important news</div>
+                    </a>
+
+                    <a href="#" class="action-card" data-action="add-program">
+                        <div class="action-icon">
+                            <i class="fas fa-calendar-plus"></i>
+                        </div>
+                        <div class="action-title">Add Program</div>
+                        <div class="action-subtitle">Schedule new activity</div>
+                    </a>
+
+                    <a href="#" class="action-card" data-action="emergency-alert">
+                        <div class="action-icon" style="background: linear-gradient(135deg, var(--danger), #dc2626);">
+                            <i class="fas fa-exclamation-triangle"></i>
+                        </div>
+                        <div class="action-title">Emergency Alert</div>
+                        <div class="action-subtitle">Urgent community notice</div>
+                    </a>
+
+                    <a href="#" class="action-card" data-action="update-times">
+                        <div class="action-icon" style="background: linear-gradient(135deg, var(--success), #059669);">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <div class="action-title">Prayer Times</div>
+                        <div class="action-subtitle">Update schedule</div>
+                    </a>
+                </div>
+            </section>
+
+            <!-- Recent Activity -->
+            <section class="recent-activity">
+                <h2 class="section-title">
+                    <i class="fas fa-history"></i>
+                    Recent Activity
+                </h2>
+                <div id="recentActivityList">
+                    <!-- Dynamic activity items will be inserted here -->
+                </div>
+            </section>
+        </div>
+
+        <!-- Bottom Navigation -->
+        <nav class="bottom-nav">
+            <div class="nav-items">
+                <a href="#" class="nav-item active" data-tab="dashboard">
+                    <i class="fas fa-home"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="#" class="nav-item" data-tab="programs">
+                    <i class="fas fa-calendar"></i>
+                    <span>Programs</span>
+                </a>
+                <a href="#" class="nav-item" data-tab="announcements">
+                    <i class="fas fa-bullhorn"></i>
+                    <span>Announcements</span>
+                </a>
+                <a href="#" class="nav-item" data-tab="board">
+                    <i class="fas fa-users"></i>
+                    <span>Board</span>
+                </a>
+                <a href="#" class="nav-item" data-tab="settings">
+                    <i class="fas fa-cog"></i>
+                    <span>Settings</span>
+                </a>
+            </div>
+        </nav>
+    </div>
+
+    <!-- Modal for Quick Actions -->
+    <div id="actionModal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" id="modalTitle">New Announcement</h3>
+                <button class="close-btn" onclick="closeModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div id="modalBody">
+                <!-- Dynamic form content will be inserted here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Success Message -->
+    <div id="successMessage" class="success-message">
+        <i class="fas fa-check-circle"></i>
+        <span id="successText">Action completed successfully!</span>
+    </div>
+
+    <!-- Scripts -->
+    <script type="module">
+        // Import Firebase modules (using your existing config)
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+        import { getFirestore, collection, addDoc, getDocs, query, orderBy, limit, where, Timestamp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+
+        // Initialize Firebase (use your existing config)
+        const firebaseConfig = window.ENV || {
+            apiKey: "demo-key",
+            authDomain: "demo.firebaseapp.com",
+            projectId: "demo-project"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        class AdminPanelNew {
+            constructor() {
+                this.currentUser = null;
+                this.activeTab = 'dashboard';
+                this.init();
+            }
+
+            init() {
+                this.setupAuth();
+                this.setupEventListeners();
+                this.setupTimeOfDay();
+            }
+
+            setupAuth() {
+                onAuthStateChanged(auth, (user) => {
+                    if (user) {
+                        this.currentUser = user;
+                        this.showApp();
+                        this.loadDashboardData();
+                    } else {
+                        this.showLogin();
+                    }
+                });
+            }
+
+            setupEventListeners() {
+                // Login form
+                document.getElementById('loginForm').addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    this.handleLogin();
+                });
+
+                // Quick action cards
+                document.querySelectorAll('.action-card').forEach(card => {
+                    card.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        const action = card.dataset.action;
+                        this.handleQuickAction(action);
+                    });
+                });
+
+                // Bottom navigation
+                document.querySelectorAll('.nav-item').forEach(item => {
+                    item.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        const tab = item.dataset.tab;
+                        this.switchTab(tab);
+                    });
+                });
+
+                // Modal close
+                document.getElementById('actionModal').addEventListener('click', (e) => {
+                    if (e.target.id === 'actionModal') {
+                        this.closeModal();
+                    }
+                });
+            }
+
+            setupTimeOfDay() {
+                const hour = new Date().getHours();
+                let timeOfDay = 'morning';
+                if (hour >= 12 && hour < 17) timeOfDay = 'afternoon';
+                else if (hour >= 17) timeOfDay = 'evening';
+
+                document.getElementById('timeOfDay').textContent = timeOfDay;
+            }
+
+            async handleLogin() {
+                const email = document.getElementById('email').value;
+                const password = document.getElementById('password').value;
+                const loginBtn = document.querySelector('.btn-primary');
+                const loginText = document.querySelector('.login-text');
+                const loading = document.querySelector('.loading');
+
+                loginText.style.display = 'none';
+                loading.style.display = 'flex';
+                loginBtn.disabled = true;
+
+                try {
+                    await signInWithEmailAndPassword(auth, email, password);
+                } catch (error) {
+                    console.error('Login error:', error);
+                    this.showError('Invalid email or password');
+
+                    loginText.style.display = 'block';
+                    loading.style.display = 'none';
+                    loginBtn.disabled = false;
+                }
+            }
+
+            showApp() {
+                document.getElementById('loginContainer').style.display = 'none';
+                document.getElementById('appContainer').style.display = 'block';
+
+                // Set user info
+                const userName = this.currentUser.email.split('@')[0];
+                document.getElementById('userName').textContent = userName;
+                document.getElementById('userAvatar').textContent = userName.charAt(0).toUpperCase();
+            }
+
+            showLogin() {
+                document.getElementById('loginContainer').style.display = 'block';
+                document.getElementById('appContainer').style.display = 'none';
+            }
+
+            async loadDashboardData() {
+                try {
+                    // Load programs count
+                    const programsQuery = query(collection(db, 'programs'), where('isActive', '==', true));
+                    const programsSnapshot = await getDocs(programsQuery);
+                    document.getElementById('activePrograms').textContent = programsSnapshot.size;
+
+                    // Load announcements count
+                    const announcementsQuery = query(collection(db, 'announcements'), where('isActive', '==', true));
+                    const announcementsSnapshot = await getDocs(announcementsQuery);
+                    document.getElementById('recentAnnouncements').textContent = announcementsSnapshot.size;
+
+                    // Load board members count
+                    const boardQuery = query(collection(db, 'boardMembers'));
+                    const boardSnapshot = await getDocs(boardQuery);
+                    document.getElementById('boardMembers').textContent = boardSnapshot.size;
+
+                    // Load priority alerts
+                    this.loadPriorityAlerts();
+
+                    // Load recent activity
+                    this.loadRecentActivity();
+
+                } catch (error) {
+                    console.error('Error loading dashboard data:', error);
+                }
+            }
+
+            async loadPriorityAlerts() {
+                const alertsList = document.getElementById('alertsList');
+
+                // Example alerts - in a real app, these would come from your database
+                const alerts = [
+                    {
+                        type: 'urgent',
+                        title: 'Friday Prayer Time Changed',
+                        message: '3 community members asked about the new Friday prayer schedule',
+                        time: '2 hours ago'
+                    },
+                    {
+                        type: 'info',
+                        title: 'Ramadan Program Planning',
+                        message: 'Schedule needs to be published for next month\'s activities',
+                        time: '1 day ago'
+                    }
+                ];
+
+                alertsList.innerHTML = alerts.map(alert => `
+                    <div class="alert-card ${alert.type}">
+                        <div class="alert-header">
+                            <div class="alert-title">${alert.title}</div>
+                            <div class="alert-time">${alert.time}</div>
+                        </div>
+                        <div class="alert-message">${alert.message}</div>
+                    </div>
+                `).join('');
+            }
+
+            async loadRecentActivity() {
+                const activityList = document.getElementById('recentActivityList');
+
+                // Example activity - in a real app, this would come from audit logs
+                const activities = [
+                    {
+                        icon: 'fas fa-bullhorn',
+                        title: 'New announcement published',
+                        time: '30 minutes ago'
+                    },
+                    {
+                        icon: 'fas fa-calendar',
+                        title: 'Quran Study program updated',
+                        time: '2 hours ago'
+                    },
+                    {
+                        icon: 'fas fa-user-plus',
+                        title: 'New board member added',
+                        time: '1 day ago'
+                    }
+                ];
+
+                activityList.innerHTML = activities.map(activity => `
+                    <div class="activity-item">
+                        <div class="activity-icon">
+                            <i class="${activity.icon}"></i>
+                        </div>
+                        <div class="activity-content">
+                            <div class="activity-title">${activity.title}</div>
+                            <div class="activity-time">${activity.time}</div>
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            handleQuickAction(action) {
+                const modal = document.getElementById('actionModal');
+                const modalTitle = document.getElementById('modalTitle');
+                const modalBody = document.getElementById('modalBody');
+
+                let title = '';
+                let content = '';
+
+                switch(action) {
+                    case 'new-announcement':
+                        title = 'Create New Announcement';
+                        content = this.getAnnouncementForm();
+                        break;
+                    case 'add-program':
+                        title = 'Add New Program';
+                        content = this.getProgramForm();
+                        break;
+                    case 'emergency-alert':
+                        title = 'Emergency Alert';
+                        content = this.getEmergencyForm();
+                        break;
+                    case 'update-times':
+                        title = 'Update Prayer Times';
+                        content = this.getPrayerTimesForm();
+                        break;
+                }
+
+                modalTitle.textContent = title;
+                modalBody.innerHTML = content;
+                modal.style.display = 'flex';
+            }
+
+            getAnnouncementForm() {
+                return `
+                    <form id="announcementForm">
+                        <div class="form-group">
+                            <label for="announcementTitle">Title</label>
+                            <input type="text" id="announcementTitle" class="form-input" placeholder="Enter announcement title" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="announcementMessage">Message</label>
+                            <textarea id="announcementMessage" class="form-input" rows="4" placeholder="Enter your message" required></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="announcementPriority">Priority</label>
+                            <select id="announcementPriority" class="form-input">
+                                <option value="low">Normal</option>
+                                <option value="medium">Important</option>
+                                <option value="high">Urgent</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="announcementExpiry">Expires On (Optional)</label>
+                            <input type="datetime-local" id="announcementExpiry" class="form-input">
+                        </div>
+                        <button type="submit" class="btn btn-primary">Publish Announcement</button>
+                    </form>
+                `;
+            }
+
+            getProgramForm() {
+                return `
+                    <form id="programForm">
+                        <div class="form-group">
+                            <label for="programName">Program Name</label>
+                            <input type="text" id="programName" class="form-input" placeholder="e.g., Quran Study" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="programTiming">Schedule</label>
+                            <input type="text" id="programTiming" class="form-input" placeholder="e.g., Fridays 7:00 PM" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="programIcon">Icon</label>
+                            <select id="programIcon" class="form-input">
+                                <option value="fas fa-book-quran">Quran</option>
+                                <option value="fas fa-graduation-cap">Education</option>
+                                <option value="fas fa-users">Community</option>
+                                <option value="fas fa-child">Youth</option>
+                                <option value="fas fa-female">Sisters</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Add Program</button>
+                    </form>
+                `;
+            }
+
+            getEmergencyForm() {
+                return `
+                    <div style="background: rgba(239, 68, 68, 0.1); padding: 16px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid var(--danger);">
+                        <strong>⚠️ Emergency Alert</strong><br>
+                        This will immediately notify all community members
+                    </div>
+                    <form id="emergencyForm">
+                        <div class="form-group">
+                            <label for="emergencyTitle">Alert Title</label>
+                            <input type="text" id="emergencyTitle" class="form-input" placeholder="e.g., Prayer Cancelled Due to Weather" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="emergencyMessage">Alert Message</label>
+                            <textarea id="emergencyMessage" class="form-input" rows="3" placeholder="Keep it brief and clear" required></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary" style="background: var(--danger);">Send Emergency Alert</button>
+                    </form>
+                `;
+            }
+
+            getPrayerTimesForm() {
+                return `
+                    <form id="prayerTimesForm">
+                        <div class="form-group">
+                            <label for="fajrTime">Fajr</label>
+                            <input type="time" id="fajrTime" class="form-input" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="zuhrTime">Zuhr</label>
+                            <input type="time" id="zuhrTime" class="form-input" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="asrTime">Asr</label>
+                            <input type="time" id="asrTime" class="form-input" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="maghribTime">Maghrib</label>
+                            <input type="time" id="maghribTime" class="form-input" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="ishaTime">Isha</label>
+                            <input type="time" id="ishaTime" class="form-input" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Update Prayer Times</button>
+                    </form>
+                `;
+            }
+
+            closeModal() {
+                document.getElementById('actionModal').style.display = 'none';
+            }
+
+            switchTab(tab) {
+                // Update active nav item
+                document.querySelectorAll('.nav-item').forEach(item => {
+                    item.classList.remove('active');
+                });
+                document.querySelector(`[data-tab="${tab}"]`).classList.add('active');
+
+                this.activeTab = tab;
+
+                // In a full implementation, you would load different content here
+                console.log(`Switched to ${tab} tab`);
+            }
+
+            showSuccess(message) {
+                const successDiv = document.getElementById('successMessage');
+                document.getElementById('successText').textContent = message;
+                successDiv.style.display = 'block';
+
+                setTimeout(() => {
+                    successDiv.style.display = 'none';
+                }, 3000);
+            }
+
+            showError(message) {
+                // Simple error handling - in production, you'd want better UX
+                alert(message);
+            }
+        }
+
+        // Initialize the admin panel when DOM is ready
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', () => {
+                new AdminPanelNew();
+            });
+        } else {
+            new AdminPanelNew();
+        }
+
+        // Make closeModal available globally for the close button
+        window.closeModal = () => {
+            document.getElementById('actionModal').style.display = 'none';
+        };
+    </script>
+</body>
+</html>
