@@ -775,25 +775,34 @@
         <span id="successText">Action completed successfully!</span>
     </div>
 
+    <!-- Load environment config -->
+    <script src="js/env.js"></script>
+
     <!-- Scripts -->
     <script type="module">
-        // Import Firebase configuration from admin panel
-        import { db, auth } from './admin-panel/firebase-config.js';
-        import {
-            collection,
-            addDoc,
-            getDocs,
-            query,
-            orderBy,
-            limit,
-            where,
-            Timestamp
-        } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
-        import {
-            signInWithEmailAndPassword,
-            signOut,
-            onAuthStateChanged
-        } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+        // Firebase configuration (same pattern as programs.js)
+        const firebaseConfig = {
+            apiKey: window.ENV?.FIREBASE_API_KEY || "your-api-key",
+            authDomain: window.ENV?.FIREBASE_AUTH_DOMAIN || "your-project.firebaseapp.com",
+            projectId: window.ENV?.FIREBASE_PROJECT_ID || "your-project-id",
+            storageBucket: window.ENV?.FIREBASE_STORAGE_BUCKET || "your-project.appspot.com",
+            messagingSenderId: window.ENV?.FIREBASE_MESSAGING_SENDER_ID || "123456789",
+            appId: window.ENV?.FIREBASE_APP_ID || "your-app-id"
+        };
+
+        console.log('Firebase config:', firebaseConfig);
+        console.log('Window ENV:', window.ENV);
+
+        // Initialize Firebase directly
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+        import { getFirestore, collection, addDoc, getDocs, query, orderBy, limit, where, Timestamp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        console.log('Firebase initialized with config:', app.options);
 
         class AdminPanelNew {
             constructor() {
