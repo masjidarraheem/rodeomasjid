@@ -367,13 +367,13 @@
         .login-title {
             font-size: 24px;
             font-weight: 700;
-            color: var(--gray-900);
+            color: #1f2937;
             margin-bottom: 8px;
         }
 
         .login-subtitle {
             font-size: 14px;
-            color: var(--gray-600);
+            color: #4b5563;
             margin-bottom: 32px;
         }
 
@@ -541,6 +541,24 @@
             }
         }
 
+        /* Mobile Login Text Fix */
+        @media (max-width: 768px) {
+            .login-title {
+                color: #111827 !important;
+                font-weight: 800;
+                text-shadow: none;
+            }
+
+            .login-subtitle {
+                color: #374151 !important;
+                font-weight: 500;
+            }
+
+            .login-form {
+                box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            }
+        }
+
         /* Dark Mode Support */
         @media (prefers-color-scheme: dark) {
             :root {
@@ -562,6 +580,15 @@
 
             .app-container {
                 background: var(--gray-100);
+            }
+
+            /* Force login text to be dark even in dark mode */
+            .login-title {
+                color: #111827 !important;
+            }
+
+            .login-subtitle {
+                color: #374151 !important;
             }
         }
 
