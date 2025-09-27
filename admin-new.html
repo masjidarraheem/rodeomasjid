@@ -1682,6 +1682,27 @@
                 this.handleQuickAction('profile');
             }
 
+            async logout() {
+                try {
+                    await signOut(auth);
+                    console.log('User signed out');
+
+                    // Clear user data
+                    this.currentUser = null;
+
+                    // Hide app and show login
+                    document.getElementById('app').style.display = 'none';
+                    document.getElementById('loginContainer').style.display = 'block';
+
+                    // Reset to initial state
+                    this.showLogin();
+
+                } catch (error) {
+                    console.error('Error signing out:', error);
+                    this.showError('Failed to logout');
+                }
+            }
+
             showSuccess(message) {
                 const successDiv = document.getElementById('successMessage');
                 document.getElementById('successText').textContent = message;
