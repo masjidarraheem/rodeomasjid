@@ -315,6 +315,23 @@
             box-shadow: 0 6px 16px rgba(37, 99, 235, 0.35);
         }
 
+        /* Programs and Board Members Lists */
+        .programs-list,
+        .board-members-list,
+        .announcements-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+            width: 100%;
+        }
+
+        .programs-list > div,
+        .board-members-list > div,
+        .announcements-list > div {
+            width: 100%;
+            display: block;
+        }
+
         .action-title {
             font-size: 14px;
             font-weight: 600;
@@ -1602,7 +1619,7 @@
                         return;
                     }
 
-                    let html = '';
+                    let html = '<div style="display: flex; flex-direction: column; width: 100%; gap: 0;">';
                     querySnapshot.forEach((docSnap) => {
                         const program = docSnap.data();
                         const id = docSnap.id;
@@ -1637,6 +1654,7 @@
                         `;
                     });
 
+                    html += '</div>';
                     programsList.innerHTML = html;
                 } catch (error) {
                     console.error('Error loading programs:', error);
