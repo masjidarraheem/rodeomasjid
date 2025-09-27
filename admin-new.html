@@ -1119,31 +1119,60 @@
             async loadPriorityAlerts() {
                 const alertsList = document.getElementById('alertsList');
 
-                // Example alerts - in a real app, these would come from your database
-                const alerts = [
-                    {
-                        type: 'urgent',
-                        title: 'Friday Prayer Time Changed',
-                        message: '3 community members asked about the new Friday prayer schedule',
-                        time: '2 hours ago'
-                    },
-                    {
-                        type: 'info',
-                        title: 'Ramadan Program Planning',
-                        message: 'Schedule needs to be published for next month\'s activities',
-                        time: '1 day ago'
-                    }
-                ];
+                try {
+                    // Load high priority announcements from Firebase
+                    const q = query(
+                        collection(db, 'announcements'),
+                        where('priority', '==', 'high'),
+                        orderBy('createdAt', 'desc'),
+                        limit(5)
+                    );
+                    const querySnapshot = await getDocs(q);
 
-                alertsList.innerHTML = alerts.map(alert => `
-                    <div class="alert-card ${alert.type}">
-                        <div class="alert-header">
-                            <div class="alert-title">${alert.title}</div>
-                            <div class="alert-time">${alert.time}</div>
+                    if (querySnapshot.empty) {
+                        alertsList.innerHTML = '<p style="text-align: center; color: #6b7280; padding: 20px;">No priority alerts at this time.</p>';
+                        return;
+                    }
+
+                    const alerts = [];
+                    querySnapshot.forEach((doc) => {
+                        const data = doc.data();
+                        const createdAt = data.createdAt?.toDate ? data.createdAt.toDate() : new Date();
+                        const timeAgo = this.getTimeAgo(createdAt);
+
+                        alerts.push({
+                            type: 'urgent',
+                            title: data.title,
+                            message: data.message,
+                            time: timeAgo
+                        });
+                    });
+
+                    alertsList.innerHTML = alerts.map(alert => `
+                        <div class="alert-card ${alert.type}">
+                            <div class="alert-header">
+                                <div class="alert-title">${alert.title}</div>
+                                <div class="alert-time">${alert.time}</div>
+                            </div>
+                            <div class="alert-message">${alert.message}</div>
                         </div>
-                        <div class="alert-message">${alert.message}</div>
-                    </div>
-                `).join('');
+                    `).join('');
+
+                } catch (error) {
+                    console.error('Error loading priority alerts:', error);
+                    alertsList.innerHTML = '<p style="text-align: center; color: #6b7280; padding: 20px;">No priority alerts at this time.</p>';
+                }
+            }
+
+            getTimeAgo(date) {
+                const now = new Date();
+                const diffInSeconds = Math.floor((now - date) / 1000);
+
+                if (diffInSeconds < 60) return 'Just now';
+                if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)} minutes ago`;
+                if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)} hours ago`;
+                if (diffInSeconds < 2592000) return `${Math.floor(diffInSeconds / 86400)} days ago`;
+                return date.toLocaleDateString();
             }
 
             async loadRecentActivity() {
