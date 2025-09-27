@@ -318,6 +318,7 @@
         /* Programs and Board Members Lists */
         .programs-list,
         .board-members-list,
+        .board-list,
         .announcements-list {
             display: flex;
             flex-direction: column;
@@ -327,6 +328,7 @@
 
         .programs-list > div,
         .board-members-list > div,
+        .board-list > div,
         .announcements-list > div {
             width: 100%;
             display: block;
@@ -1235,6 +1237,10 @@
                         title = 'Update Prayer Times';
                         content = this.getPrayerTimesForm();
                         break;
+                    case 'add-board-member':
+                        title = 'Add Board Member';
+                        content = this.getBoardMemberForm();
+                        break;
                     case 'profile':
                         title = 'User Profile';
                         content = this.getProfileForm();
@@ -1244,6 +1250,36 @@
                 modalTitle.textContent = title;
                 modalBody.innerHTML = content;
                 modal.style.display = 'flex';
+
+                // Setup form handlers for add board member
+                if (action === 'add-board-member') {
+                    setTimeout(() => {
+                        const boardMemberForm = document.getElementById('boardMemberForm');
+                        if (boardMemberForm) {
+                            boardMemberForm.onsubmit = async (e) => {
+                                e.preventDefault();
+
+                                const formData = new FormData(e.target);
+                                const newMember = {
+                                    name: formData.get('name'),
+                                    title: formData.get('title'),
+                                    email: formData.get('email'),
+                                    createdAt: new Date()
+                                };
+
+                                try {
+                                    await addDoc(collection(db, 'boardMembers'), newMember);
+                                    this.showSuccess('Board member added successfully!');
+                                    this.closeModal();
+                                    this.loadBoardMembersList(); // Refresh the list if on board page
+                                } catch (error) {
+                                    console.error('Error adding board member:', error);
+                                    alert('Error adding board member. Please try again.');
+                                }
+                            };
+                        }
+                    }, 100);
+                }
             }
 
             getAnnouncementForm() {
@@ -1296,6 +1332,26 @@
                             </select>
                         </div>
                         <button type="submit" class="btn btn-primary">Add Program</button>
+                    </form>
+                `;
+            }
+
+            getBoardMemberForm(member = null) {
+                return `
+                    <form id="boardMemberForm">
+                        <div class="form-group">
+                            <label for="boardMemberName">Full Name</label>
+                            <input type="text" name="name" id="boardMemberName" class="form-input" placeholder="e.g., John Smith" value="${member ? member.name : ''}" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="boardMemberTitle">Title/Position</label>
+                            <input type="text" name="title" id="boardMemberTitle" class="form-input" placeholder="e.g., President, Secretary" value="${member ? (member.title || '') : ''}" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="boardMemberEmail">Email Address</label>
+                            <input type="email" name="email" id="boardMemberEmail" class="form-input" placeholder="e.g., john@example.com" value="${member ? (member.email || '') : ''}">
+                        </div>
+                        <button type="submit" class="btn btn-primary">${member ? 'Update' : 'Add'} Board Member</button>
                     </form>
                 `;
             }
@@ -1828,7 +1884,37 @@
 
             editBoardMember(id, member) {
                 console.log('Edit board member:', id, member);
-                this.showSuccess('Board member editing functionality coming soon!');
+                const form = this.getBoardMemberForm(member);
+                this.showModal('Edit Board Member', form);
+
+                // Handle form submission
+                setTimeout(() => {
+                    const boardMemberForm = document.getElementById('boardMemberForm');
+                    if (boardMemberForm) {
+                        boardMemberForm.onsubmit = async (e) => {
+                            e.preventDefault();
+
+                            const formData = new FormData(e.target);
+                            const updatedMember = {
+                                name: formData.get('name'),
+                                title: formData.get('title'),
+                                email: formData.get('email')
+                            };
+
+                            try {
+                                const docRef = doc(db, 'boardMembers', id);
+                                await updateDoc(docRef, updatedMember);
+
+                                this.showSuccess('Board member updated successfully!');
+                                this.closeModal();
+                                this.loadBoardMembersList(); // Refresh the list
+                            } catch (error) {
+                                console.error('Error updating board member:', error);
+                                alert('Error updating board member. Please try again.');
+                            }
+                        };
+                    }
+                }, 100);
             }
 
             deleteBoardMember(id) {
