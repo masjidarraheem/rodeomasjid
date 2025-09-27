@@ -896,20 +896,18 @@
                     this.handleLogin();
                 });
 
-                // User avatar menu
-                const userAvatar = document.getElementById('userAvatar');
-                const userMenu = document.getElementById('userMenu');
-
-                userAvatar.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    userMenu.style.display = userMenu.style.display === 'block' ? 'none' : 'block';
+                // Quick action cards - will be setup after app loads
+                // Bottom navigation - will be setup after app loads
+                // Modal close
+                document.getElementById('actionModal').addEventListener('click', (e) => {
+                    if (e.target.id === 'actionModal') {
+                        this.closeModal();
+                    }
                 });
+            }
 
-                // Close menu when clicking outside
-                document.addEventListener('click', () => {
-                    userMenu.style.display = 'none';
-                });
-
+            setupAppEventListeners() {
+                // Setup event listeners after app is loaded
                 // Quick action cards
                 document.querySelectorAll('.action-card').forEach(card => {
                     card.addEventListener('click', (e) => {
@@ -926,13 +924,6 @@
                         const tab = item.dataset.tab;
                         this.switchTab(tab);
                     });
-                });
-
-                // Modal close
-                document.getElementById('actionModal').addEventListener('click', (e) => {
-                    if (e.target.id === 'actionModal') {
-                        this.closeModal();
-                    }
                 });
             }
 
@@ -996,6 +987,36 @@
                 const userName = this.currentUser.email.split('@')[0];
                 document.getElementById('userName').textContent = userName;
                 document.getElementById('userAvatar').textContent = userName.charAt(0).toUpperCase();
+
+                // Setup all app event listeners after app is shown
+                this.setupUserMenu();
+                this.setupAppEventListeners();
+            }
+
+            setupUserMenu() {
+                const userAvatar = document.getElementById('userAvatar');
+                const userMenu = document.getElementById('userMenu');
+
+                if (userAvatar && userMenu) {
+                    console.log('Setting up user menu event handlers');
+
+                    userAvatar.addEventListener('click', (e) => {
+                        console.log('User avatar clicked');
+                        e.stopPropagation();
+                        const isVisible = userMenu.style.display === 'block';
+                        userMenu.style.display = isVisible ? 'none' : 'block';
+                        console.log('Menu display:', userMenu.style.display);
+                    });
+
+                    // Close menu when clicking outside
+                    document.addEventListener('click', (e) => {
+                        if (!userAvatar.contains(e.target)) {
+                            userMenu.style.display = 'none';
+                        }
+                    });
+                } else {
+                    console.error('User avatar or menu not found');
+                }
             }
 
             showLogin() {
@@ -1277,23 +1298,216 @@
 
                 switch(tab) {
                     case 'dashboard':
-                        this.loadDashboardData();
+                        this.loadDashboardContent();
                         break;
                     case 'programs':
-                        dashboard.innerHTML = '<h2>Programs Management</h2><p>Program management interface coming soon...</p>';
+                        this.loadProgramsContent();
                         break;
                     case 'announcements':
-                        dashboard.innerHTML = '<h2>Announcements</h2><p>Announcement management interface coming soon...</p>';
+                        this.loadAnnouncementsContent();
                         break;
                     case 'board':
-                        dashboard.innerHTML = '<h2>Board Members</h2><p>Board member management interface coming soon...</p>';
+                        this.loadBoardContent();
                         break;
                     case 'settings':
-                        dashboard.innerHTML = '<h2>Settings</h2><p>Settings interface coming soon...</p>';
+                        this.loadSettingsContent();
                         break;
                     default:
                         console.log(`Switched to ${tab} tab`);
                 }
+            }
+
+            loadDashboardContent() {
+                const dashboard = document.querySelector('.dashboard');
+                dashboard.innerHTML = `
+                    <!-- Priority Alerts -->
+                    <section class="priority-alerts">
+                        <h2 class="section-title">
+                            <i class="fas fa-bell"></i>
+                            Needs Your Attention
+                        </h2>
+                        <div id="alertsList">
+                            <!-- Dynamic alerts will be inserted here -->
+                        </div>
+                    </section>
+
+                    <!-- Quick Actions -->
+                    <section class="quick-actions">
+                        <h2 class="section-title">
+                            <i class="fas fa-zap"></i>
+                            Quick Actions
+                        </h2>
+                        <div class="actions-grid">
+                            <a href="#" class="action-card" data-action="new-announcement">
+                                <div class="action-icon">
+                                    <i class="fas fa-bullhorn"></i>
+                                </div>
+                                <div class="action-title">New Announcement</div>
+                                <div class="action-subtitle">Share important news</div>
+                            </a>
+
+                            <a href="#" class="action-card" data-action="add-program">
+                                <div class="action-icon">
+                                    <i class="fas fa-calendar-plus"></i>
+                                </div>
+                                <div class="action-title">Add Program</div>
+                                <div class="action-subtitle">Schedule new activity</div>
+                            </a>
+
+                            <a href="#" class="action-card" data-action="emergency-alert">
+                                <div class="action-icon" style="background: linear-gradient(135deg, var(--danger), #dc2626);">
+                                    <i class="fas fa-exclamation-triangle"></i>
+                                </div>
+                                <div class="action-title">Emergency Alert</div>
+                                <div class="action-subtitle">Urgent community notice</div>
+                            </a>
+
+                            <a href="#" class="action-card" data-action="update-times">
+                                <div class="action-icon" style="background: linear-gradient(135deg, var(--success), #059669);">
+                                    <i class="fas fa-clock"></i>
+                                </div>
+                                <div class="action-title">Prayer Times</div>
+                                <div class="action-subtitle">Update schedule</div>
+                            </a>
+                        </div>
+                    </section>
+
+                    <!-- Recent Activity -->
+                    <section class="recent-activity">
+                        <h2 class="section-title">
+                            <i class="fas fa-history"></i>
+                            Recent Activity
+                        </h2>
+                        <div id="recentActivityList">
+                            <!-- Dynamic activity items will be inserted here -->
+                        </div>
+                    </section>
+                `;
+
+                // Re-setup event listeners for new content
+                this.setupAppEventListeners();
+                this.loadDashboardData();
+            }
+
+            loadProgramsContent() {
+                const dashboard = document.querySelector('.dashboard');
+                dashboard.innerHTML = `
+                    <div style="margin-bottom: 24px;">
+                        <h2 class="section-title" style="color: #1f2937 !important;">
+                            <i class="fas fa-calendar"></i>
+                            Programs Management
+                        </h2>
+                        <button class="btn btn-primary" onclick="admin.handleQuickAction('add-program')" style="margin-bottom: 20px;">
+                            <i class="fas fa-plus"></i> Add New Program
+                        </button>
+                    </div>
+
+                    <div class="programs-list">
+                        <div id="programsList" class="loading">
+                            <div class="spinner"></div>
+                            Loading programs...
+                        </div>
+                    </div>
+                `;
+                this.loadProgramsList();
+            }
+
+            loadAnnouncementsContent() {
+                const dashboard = document.querySelector('.dashboard');
+                dashboard.innerHTML = `
+                    <div style="margin-bottom: 24px;">
+                        <h2 class="section-title" style="color: #1f2937 !important;">
+                            <i class="fas fa-bullhorn"></i>
+                            Announcements Management
+                        </h2>
+                        <div style="display: flex; gap: 12px; margin-bottom: 20px;">
+                            <button class="btn btn-primary" onclick="admin.handleQuickAction('new-announcement')">
+                                <i class="fas fa-plus"></i> New Announcement
+                            </button>
+                            <button class="btn" style="background: var(--danger); color: white;" onclick="admin.handleQuickAction('emergency-alert')">
+                                <i class="fas fa-exclamation-triangle"></i> Emergency Alert
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="announcements-list">
+                        <div id="announcementsList" class="loading">
+                            <div class="spinner"></div>
+                            Loading announcements...
+                        </div>
+                    </div>
+                `;
+                this.loadAnnouncementsList();
+            }
+
+            loadBoardContent() {
+                const dashboard = document.querySelector('.dashboard');
+                dashboard.innerHTML = `
+                    <div style="margin-bottom: 24px;">
+                        <h2 class="section-title" style="color: #1f2937 !important;">
+                            <i class="fas fa-users"></i>
+                            Board Members Management
+                        </h2>
+                        <button class="btn btn-primary" onclick="admin.addBoardMember()" style="margin-bottom: 20px;">
+                            <i class="fas fa-user-plus"></i> Add Board Member
+                        </button>
+                    </div>
+
+                    <div class="board-list">
+                        <div id="boardMembersList" class="loading">
+                            <div class="spinner"></div>
+                            Loading board members...
+                        </div>
+                    </div>
+                `;
+                this.loadBoardMembersList();
+            }
+
+            loadSettingsContent() {
+                const dashboard = document.querySelector('.dashboard');
+                dashboard.innerHTML = `
+                    <div style="margin-bottom: 24px;">
+                        <h2 class="section-title" style="color: #1f2937 !important;">
+                            <i class="fas fa-cog"></i>
+                            Settings
+                        </h2>
+                    </div>
+
+                    <div style="display: grid; gap: 20px;">
+                        <div style="background: white; border-radius: 12px; padding: 20px; border: 1px solid #e5e7eb;">
+                            <h3 style="color: #1f2937; margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+                                <i class="fas fa-clock"></i>
+                                Prayer Times Management
+                            </h3>
+                            <p style="color: #6b7280; margin-bottom: 16px;">Update prayer times and schedules</p>
+                            <button class="btn btn-primary" onclick="admin.handleQuickAction('update-times')">
+                                <i class="fas fa-edit"></i> Update Prayer Times
+                            </button>
+                        </div>
+
+                        <div style="background: white; border-radius: 12px; padding: 20px; border: 1px solid #e5e7eb;">
+                            <h3 style="color: #1f2937; margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+                                <i class="fas fa-user"></i>
+                                Account Settings
+                            </h3>
+                            <p style="color: #6b7280; margin-bottom: 16px;">Manage your admin account</p>
+                            <button class="btn btn-outline" onclick="admin.handleQuickAction('profile')">
+                                <i class="fas fa-user-cog"></i> View Profile
+                            </button>
+                        </div>
+
+                        <div style="background: white; border-radius: 12px; padding: 20px; border: 1px solid #e5e7eb;">
+                            <h3 style="color: #1f2937; margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+                                <i class="fas fa-download"></i>
+                                Data Export
+                            </h3>
+                            <p style="color: #6b7280; margin-bottom: 16px;">Export community data for backup</p>
+                            <button class="btn btn-outline" onclick="admin.exportData()">
+                                <i class="fas fa-download"></i> Export Data
+                            </button>
+                        </div>
+                    </div>
+                `;
             }
 
             async logout() {
@@ -1323,6 +1537,204 @@
             showError(message) {
                 // Simple error handling - in production, you'd want better UX
                 alert(message);
+            }
+
+            // Data loading methods for each section
+            async loadProgramsList() {
+                try {
+                    const programsList = document.getElementById('programsList');
+                    const q = query(collection(db, 'programs'), orderBy('createdAt', 'desc'));
+                    const querySnapshot = await getDocs(q);
+
+                    if (querySnapshot.empty) {
+                        programsList.innerHTML = '<p style="text-align: center; color: #6b7280; padding: 40px;">No programs found. Add your first program!</p>';
+                        return;
+                    }
+
+                    let html = '';
+                    querySnapshot.forEach((docSnap) => {
+                        const program = docSnap.data();
+                        const id = docSnap.id;
+
+                        html += `
+                            <div style="background: white; border-radius: 12px; padding: 20px; margin-bottom: 16px; border: 1px solid #e5e7eb;">
+                                <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 12px;">
+                                    <div style="flex: 1;">
+                                        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 8px;">
+                                            <div style="width: 40px; height: 40px; border-radius: 8px; background: linear-gradient(135deg, var(--primary), var(--primary-dark)); display: flex; align-items: center; justify-content: center; color: white;">
+                                                <i class="${program.icon}"></i>
+                                            </div>
+                                            <div>
+                                                <h3 style="color: #1f2937; font-size: 16px; font-weight: 600; margin: 0;">${program.name}</h3>
+                                                <p style="color: #6b7280; font-size: 14px; margin: 0;">${program.timing}</p>
+                                            </div>
+                                        </div>
+                                        <div style="display: inline-block; padding: 4px 8px; border-radius: 6px; font-size: 12px; font-weight: 500; ${program.isActive ? 'background: #d1fae5; color: #065f46;' : 'background: #fee2e2; color: #991b1b;'}">
+                                            ${program.isActive ? '✓ Active' : '✗ Inactive'}
+                                        </div>
+                                    </div>
+                                    <div style="display: flex; gap: 8px;">
+                                        <button onclick="admin.editProgram('${id}', ${JSON.stringify(program).replace(/"/g, '&quot;')})" style="padding: 8px 12px; border: 1px solid #d1d5db; border-radius: 6px; background: white; color: #374151; font-size: 12px;">
+                                            <i class="fas fa-edit"></i> Edit
+                                        </button>
+                                        <button onclick="admin.deleteProgram('${id}')" style="padding: 8px 12px; border: 1px solid #dc2626; border-radius: 6px; background: #dc2626; color: white; font-size: 12px;">
+                                            <i class="fas fa-trash"></i> Delete
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    });
+
+                    programsList.innerHTML = html;
+                } catch (error) {
+                    console.error('Error loading programs:', error);
+                    document.getElementById('programsList').innerHTML = '<p style="color: #dc2626; text-align: center; padding: 20px;">Error loading programs. Please refresh the page.</p>';
+                }
+            }
+
+            async loadAnnouncementsList() {
+                try {
+                    const announcementsList = document.getElementById('announcementsList');
+                    const q = query(collection(db, 'announcements'), orderBy('createdAt', 'desc'), limit(20));
+                    const querySnapshot = await getDocs(q);
+
+                    if (querySnapshot.empty) {
+                        announcementsList.innerHTML = '<p style="text-align: center; color: #6b7280; padding: 40px;">No announcements found. Create your first announcement!</p>';
+                        return;
+                    }
+
+                    let html = '';
+                    querySnapshot.forEach((docSnap) => {
+                        const announcement = docSnap.data();
+                        const id = docSnap.id;
+                        const createdAt = announcement.createdAt?.toDate ? announcement.createdAt.toDate() : new Date();
+
+                        html += `
+                            <div style="background: white; border-radius: 12px; padding: 20px; margin-bottom: 16px; border: 1px solid #e5e7eb; ${announcement.priority === 'high' ? 'border-left: 4px solid #dc2626;' : announcement.priority === 'medium' ? 'border-left: 4px solid #d97706;' : 'border-left: 4px solid #2563eb;'}">
+                                <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 12px;">
+                                    <div style="flex: 1;">
+                                        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+                                            <span style="display: inline-block; padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: 600; text-transform: uppercase; ${announcement.priority === 'high' ? 'background: #fee2e2; color: #dc2626;' : announcement.priority === 'medium' ? 'background: #fef3c7; color: #d97706;' : 'background: #dbeafe; color: #2563eb;'}">
+                                                ${announcement.priority === 'high' ? 'URGENT' : announcement.priority === 'medium' ? 'IMPORTANT' : 'NORMAL'}
+                                            </span>
+                                            <span style="color: #6b7280; font-size: 12px;">${createdAt.toLocaleDateString()}</span>
+                                        </div>
+                                        <h3 style="color: #1f2937; font-size: 16px; font-weight: 600; margin: 0 0 8px 0;">${announcement.title}</h3>
+                                        <p style="color: #4b5563; font-size: 14px; line-height: 1.4; margin: 0;">${announcement.message}</p>
+                                    </div>
+                                    <div style="display: flex; gap: 8px; margin-left: 16px;">
+                                        <button onclick="admin.editAnnouncement('${id}', ${JSON.stringify(announcement).replace(/"/g, '&quot;')})" style="padding: 8px 12px; border: 1px solid #d1d5db; border-radius: 6px; background: white; color: #374151; font-size: 12px;">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button onclick="admin.deleteAnnouncement('${id}')" style="padding: 8px 12px; border: 1px solid #dc2626; border-radius: 6px; background: #dc2626; color: white; font-size: 12px;">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    });
+
+                    announcementsList.innerHTML = html;
+                } catch (error) {
+                    console.error('Error loading announcements:', error);
+                    document.getElementById('announcementsList').innerHTML = '<p style="color: #dc2626; text-align: center; padding: 20px;">Error loading announcements. Please refresh the page.</p>';
+                }
+            }
+
+            async loadBoardMembersList() {
+                try {
+                    const boardMembersList = document.getElementById('boardMembersList');
+                    const q = query(collection(db, 'boardMembers'), orderBy('name', 'asc'));
+                    const querySnapshot = await getDocs(q);
+
+                    if (querySnapshot.empty) {
+                        boardMembersList.innerHTML = '<p style="text-align: center; color: #6b7280; padding: 40px;">No board members found. Add the first board member!</p>';
+                        return;
+                    }
+
+                    let html = '';
+                    querySnapshot.forEach((docSnap) => {
+                        const member = docSnap.data();
+                        const id = docSnap.id;
+
+                        html += `
+                            <div style="background: white; border-radius: 12px; padding: 20px; margin-bottom: 16px; border: 1px solid #e5e7eb;">
+                                <div style="display: flex; justify-content: space-between; align-items: center;">
+                                    <div style="display: flex; align-items: center; gap: 16px;">
+                                        <div style="width: 48px; height: 48px; border-radius: 50%; background: linear-gradient(135deg, var(--primary), var(--primary-dark)); display: flex; align-items: center; justify-content: center; color: white; font-size: 18px; font-weight: 600;">
+                                            ${member.name.charAt(0).toUpperCase()}
+                                        </div>
+                                        <div>
+                                            <h3 style="color: #1f2937; font-size: 16px; font-weight: 600; margin: 0 0 4px 0;">${member.name}</h3>
+                                            <p style="color: #6b7280; font-size: 14px; margin: 0 0 2px 0;">${member.title || 'Board Member'}</p>
+                                            ${member.email ? `<p style="color: #6b7280; font-size: 12px; margin: 0;"><i class="fas fa-envelope"></i> ${member.email}</p>` : ''}
+                                        </div>
+                                    </div>
+                                    <div style="display: flex; gap: 8px;">
+                                        <button onclick="admin.editBoardMember('${id}', ${JSON.stringify(member).replace(/"/g, '&quot;')})" style="padding: 8px 12px; border: 1px solid #d1d5db; border-radius: 6px; background: white; color: #374151; font-size: 12px;">
+                                            <i class="fas fa-edit"></i> Edit
+                                        </button>
+                                        <button onclick="admin.deleteBoardMember('${id}')" style="padding: 8px 12px; border: 1px solid #dc2626; border-radius: 6px; background: #dc2626; color: white; font-size: 12px;">
+                                            <i class="fas fa-trash"></i> Delete
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    });
+
+                    boardMembersList.innerHTML = html;
+                } catch (error) {
+                    console.error('Error loading board members:', error);
+                    document.getElementById('boardMembersList').innerHTML = '<p style="color: #dc2626; text-align: center; padding: 20px;">Error loading board members. Please refresh the page.</p>';
+                }
+            }
+
+            // Placeholder methods for CRUD operations
+            editProgram(id, program) {
+                console.log('Edit program:', id, program);
+                this.showSuccess('Program editing functionality coming soon!');
+            }
+
+            deleteProgram(id) {
+                if (confirm('Are you sure you want to delete this program?')) {
+                    console.log('Delete program:', id);
+                    this.showSuccess('Program deletion functionality coming soon!');
+                }
+            }
+
+            editAnnouncement(id, announcement) {
+                console.log('Edit announcement:', id, announcement);
+                this.showSuccess('Announcement editing functionality coming soon!');
+            }
+
+            deleteAnnouncement(id) {
+                if (confirm('Are you sure you want to delete this announcement?')) {
+                    console.log('Delete announcement:', id);
+                    this.showSuccess('Announcement deletion functionality coming soon!');
+                }
+            }
+
+            addBoardMember() {
+                this.handleQuickAction('add-board-member');
+            }
+
+            editBoardMember(id, member) {
+                console.log('Edit board member:', id, member);
+                this.showSuccess('Board member editing functionality coming soon!');
+            }
+
+            deleteBoardMember(id) {
+                if (confirm('Are you sure you want to delete this board member?')) {
+                    console.log('Delete board member:', id);
+                    this.showSuccess('Board member deletion functionality coming soon!');
+                }
+            }
+
+            exportData() {
+                this.showSuccess('Data export functionality coming soon!');
             }
         }
 
