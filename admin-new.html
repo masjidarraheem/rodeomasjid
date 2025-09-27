@@ -94,6 +94,12 @@
         .header-title {
             font-size: 18px;
             font-weight: 600;
+            cursor: pointer;
+            transition: opacity 0.2s ease;
+        }
+
+        .header-title:hover {
+            opacity: 0.8;
         }
 
         .user-avatar {
@@ -908,6 +914,16 @@
 
             setupAppEventListeners() {
                 // Setup event listeners after app is loaded
+
+                // Header title click to go back to dashboard
+                const headerTitle = document.querySelector('.header-title');
+                if (headerTitle) {
+                    headerTitle.addEventListener('click', () => {
+                        console.log('Header title clicked - going to dashboard');
+                        this.switchTab('dashboard');
+                    });
+                }
+
                 // Quick action cards
                 document.querySelectorAll('.action-card').forEach(card => {
                     card.addEventListener('click', (e) => {
@@ -922,6 +938,7 @@
                     item.addEventListener('click', (e) => {
                         e.preventDefault();
                         const tab = item.dataset.tab;
+                        console.log('Bottom nav clicked:', tab);
                         this.switchTab(tab);
                     });
                 });
@@ -1318,7 +1335,9 @@
             }
 
             loadDashboardContent() {
+                console.log('Loading dashboard content...');
                 const dashboard = document.querySelector('.dashboard');
+
                 dashboard.innerHTML = `
                     <!-- Priority Alerts -->
                     <section class="priority-alerts">
@@ -1385,8 +1404,10 @@
                 `;
 
                 // Re-setup event listeners for new content
-                this.setupAppEventListeners();
-                this.loadDashboardData();
+                setTimeout(() => {
+                    this.setupAppEventListeners();
+                    this.loadDashboardData();
+                }, 100);
             }
 
             loadProgramsContent() {
