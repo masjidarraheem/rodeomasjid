@@ -106,6 +106,53 @@
             justify-content: center;
             font-size: 14px;
             font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: 2px solid transparent;
+            position: relative;
+        }
+
+        .user-avatar:hover {
+            background: rgba(255, 255, 255, 0.3);
+            border-color: rgba(255, 255, 255, 0.5);
+            transform: scale(1.05);
+        }
+
+        /* Logout dropdown */
+        .user-menu {
+            position: absolute;
+            top: 45px;
+            right: 0;
+            background: white;
+            border-radius: 8px;
+            box-shadow: var(--shadow-lg);
+            min-width: 150px;
+            z-index: 1000;
+            display: none;
+            overflow: hidden;
+        }
+
+        .user-menu-item {
+            padding: 12px 16px;
+            font-size: 14px;
+            color: var(--gray-700);
+            cursor: pointer;
+            transition: background-color 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .user-menu-item:hover {
+            background: var(--gray-50);
+        }
+
+        .user-menu-item.danger {
+            color: var(--danger);
+        }
+
+        .user-menu-item.danger:hover {
+            background: rgba(239, 68, 68, 0.1);
         }
 
         .welcome-message {
@@ -143,7 +190,7 @@
         .section-title {
             font-size: 16px;
             font-weight: 600;
-            color: var(--gray-900);
+            color: #1f2937 !important;
             margin-bottom: 12px;
             display: flex;
             align-items: center;
@@ -182,18 +229,18 @@
         .alert-title {
             font-size: 14px;
             font-weight: 600;
-            color: var(--gray-900);
+            color: #1f2937 !important;
             flex: 1;
         }
 
         .alert-time {
             font-size: 12px;
-            color: var(--gray-500);
+            color: #6b7280 !important;
         }
 
         .alert-message {
             font-size: 13px;
-            color: var(--gray-600);
+            color: #4b5563 !important;
             line-height: 1.4;
         }
 
@@ -215,7 +262,7 @@
             padding: 20px 16px;
             text-align: center;
             text-decoration: none;
-            color: var(--gray-700);
+            color: #374151 !important;
             transition: all 0.2s ease;
             box-shadow: var(--shadow-sm);
         }
@@ -243,11 +290,12 @@
             font-size: 14px;
             font-weight: 600;
             margin-bottom: 4px;
+            color: #1f2937 !important;
         }
 
         .action-subtitle {
             font-size: 12px;
-            color: var(--gray-500);
+            color: #6b7280 !important;
         }
 
         /* Recent Activity */
@@ -282,12 +330,12 @@
         .activity-title {
             font-size: 13px;
             font-weight: 500;
-            color: var(--gray-900);
+            color: #1f2937 !important;
         }
 
         .activity-time {
             font-size: 12px;
-            color: var(--gray-500);
+            color: #6b7280 !important;
         }
 
         /* Bottom Navigation */
@@ -642,7 +690,19 @@
         <div class="header">
             <div class="header-top">
                 <h1 class="header-title">Community Dashboard</h1>
-                <div class="user-avatar" id="userAvatar">MB</div>
+                <div class="user-avatar" id="userAvatar">
+                    MB
+                    <div class="user-menu" id="userMenu">
+                        <div class="user-menu-item" onclick="admin.showProfile()">
+                            <i class="fas fa-user"></i>
+                            Profile
+                        </div>
+                        <div class="user-menu-item danger" onclick="admin.logout()">
+                            <i class="fas fa-sign-out-alt"></i>
+                            Logout
+                        </div>
+                    </div>
+                </div>
             </div>
             <p class="welcome-message">Good <span id="timeOfDay">morning</span>, <span id="userName">Board Member</span></p>
             <div class="community-stats">
@@ -834,6 +894,20 @@
                 document.getElementById('loginForm').addEventListener('submit', (e) => {
                     e.preventDefault();
                     this.handleLogin();
+                });
+
+                // User avatar menu
+                const userAvatar = document.getElementById('userAvatar');
+                const userMenu = document.getElementById('userMenu');
+
+                userAvatar.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    userMenu.style.display = userMenu.style.display === 'block' ? 'none' : 'block';
+                });
+
+                // Close menu when clicking outside
+                document.addEventListener('click', () => {
+                    userMenu.style.display = 'none';
                 });
 
                 // Quick action cards
@@ -1047,6 +1121,10 @@
                         title = 'Update Prayer Times';
                         content = this.getPrayerTimesForm();
                         break;
+                    case 'profile':
+                        title = 'User Profile';
+                        content = this.getProfileForm();
+                        break;
                 }
 
                 modalTitle.textContent = title;
@@ -1156,6 +1234,27 @@
                 `;
             }
 
+            getProfileForm() {
+                return `
+                    <div style="text-align: center; margin-bottom: 20px;">
+                        <div style="width: 60px; height: 60px; border-radius: 50%; background: linear-gradient(135deg, var(--primary), var(--primary-dark)); margin: 0 auto 12px; display: flex; align-items: center; justify-content: center; font-size: 24px; color: white;">
+                            ${this.currentUser?.email?.charAt(0).toUpperCase() || 'U'}
+                        </div>
+                        <h3 style="color: #1f2937; margin-bottom: 4px;">${this.currentUser?.email || 'User'}</h3>
+                        <p style="color: #6b7280; font-size: 14px;">Board Member</p>
+                    </div>
+                    <div style="background: #f9fafb; padding: 16px; border-radius: 8px; margin-bottom: 20px;">
+                        <h4 style="color: #1f2937; margin-bottom: 8px;">Account Information</h4>
+                        <p style="color: #4b5563; font-size: 14px; margin-bottom: 4px;"><strong>Email:</strong> ${this.currentUser?.email || 'Not available'}</p>
+                        <p style="color: #4b5563; font-size: 14px; margin-bottom: 4px;"><strong>Role:</strong> Administrator</p>
+                        <p style="color: #4b5563; font-size: 14px;"><strong>Last Login:</strong> ${new Date().toLocaleDateString()}</p>
+                    </div>
+                    <button type="button" class="btn btn-primary" onclick="window.admin.logout()" style="width: 100%; background: var(--danger);">
+                        <i class="fas fa-sign-out-alt"></i> Logout
+                    </button>
+                `;
+            }
+
             closeModal() {
                 document.getElementById('actionModal').style.display = 'none';
             }
@@ -1169,8 +1268,46 @@
 
                 this.activeTab = tab;
 
-                // In a full implementation, you would load different content here
-                console.log(`Switched to ${tab} tab`);
+                // Load different content based on tab
+                this.loadTabContent(tab);
+            }
+
+            loadTabContent(tab) {
+                const dashboard = document.querySelector('.dashboard');
+
+                switch(tab) {
+                    case 'dashboard':
+                        this.loadDashboardData();
+                        break;
+                    case 'programs':
+                        dashboard.innerHTML = '<h2>Programs Management</h2><p>Program management interface coming soon...</p>';
+                        break;
+                    case 'announcements':
+                        dashboard.innerHTML = '<h2>Announcements</h2><p>Announcement management interface coming soon...</p>';
+                        break;
+                    case 'board':
+                        dashboard.innerHTML = '<h2>Board Members</h2><p>Board member management interface coming soon...</p>';
+                        break;
+                    case 'settings':
+                        dashboard.innerHTML = '<h2>Settings</h2><p>Settings interface coming soon...</p>';
+                        break;
+                    default:
+                        console.log(`Switched to ${tab} tab`);
+                }
+            }
+
+            async logout() {
+                try {
+                    await signOut(auth);
+                    this.showLogin();
+                } catch (error) {
+                    console.error('Logout error:', error);
+                    this.showError('Failed to logout');
+                }
+            }
+
+            showProfile() {
+                this.handleQuickAction('profile');
             }
 
             showSuccess(message) {
@@ -1190,12 +1327,15 @@
         }
 
         // Initialize the admin panel when DOM is ready
+        let admin;
         if (document.readyState === 'loading') {
             document.addEventListener('DOMContentLoaded', () => {
-                new AdminPanelNew();
+                admin = new AdminPanelNew();
+                window.admin = admin; // Make available globally
             });
         } else {
-            new AdminPanelNew();
+            admin = new AdminPanelNew();
+            window.admin = admin; // Make available globally
         }
 
         // Make closeModal available globally for the close button
