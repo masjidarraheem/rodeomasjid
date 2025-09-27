@@ -1571,14 +1571,19 @@
                     </div>
 
                     <div style="display: grid; gap: 20px;">
-                        <div style="background: white; border-radius: 12px; padding: 20px; border: 1px solid #e5e7eb;">
-                            <h3 style="color: #1f2937; margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
-                                <i class="fas fa-clock"></i>
+                        <div style="background: linear-gradient(135deg, #3b82f6, #1e40af); border-radius: 12px; padding: 24px; border: 1px solid #e5e7eb; color: white;">
+                            <h3 style="color: white; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; font-size: 18px;">
+                                <i class="fas fa-mosque"></i>
                                 Prayer Times Management
                             </h3>
-                            <p style="color: #6b7280; margin-bottom: 16px;">Update prayer times and schedules</p>
-                            <button class="btn btn-primary" onclick="admin.handleQuickAction('update-times')">
-                                <i class="fas fa-edit"></i> Update Prayer Times
+                            <p style="color: rgba(255, 255, 255, 0.9); margin-bottom: 16px; line-height: 1.5;">Prayer times are managed through MasjidApp. Your login credentials will be sent via email.</p>
+                            <div style="background: rgba(255, 255, 255, 0.1); border-radius: 8px; padding: 16px; margin-bottom: 16px;">
+                                <p style="margin: 0; color: rgba(255, 255, 255, 0.95); font-size: 14px;">
+                                    <strong>MasjidApp URL:</strong> <span style="color: #fbbf24;">https://masjidapp.com</span>
+                                </p>
+                            </div>
+                            <button class="btn" style="background: rgba(255, 255, 255, 0.2); color: white; border: 1px solid rgba(255, 255, 255, 0.3);" onclick="window.open('https://masjidapp.com', '_blank')">
+                                <i class="fas fa-external-link-alt"></i> Open MasjidApp
                             </button>
                         </div>
 
