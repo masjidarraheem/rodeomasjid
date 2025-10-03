@@ -166,7 +166,19 @@ class FCMPushManager {
 
             if (!response.ok) {
                 console.error('❌ Push notification failed:', result);
-                throw new Error(result.error || `Failed to send push notifications (${response.status})`);
+                console.error('❌ Full error details:', JSON.stringify(result, null, 2));
+
+                // Provide more specific error information
+                if (result.details && result.details.includes('Unexpected token')) {
+                    console.error('❌ Worker is getting HTML instead of JSON from Firebase FCM API');
+                    console.error('   This usually means:');
+                    console.error('   1. Firebase Server Key is invalid or expired');
+                    console.error('   2. No FCM tokens stored in Cloudflare KV');
+                    console.error('   3. Firebase FCM API returned error page');
+                    throw new Error('Cloudflare Worker failed to communicate with Firebase FCM API. Check Firebase Server Key and subscriber tokens.');
+                } else {
+                    throw new Error(result.error || `Failed to send push notifications (${response.status})`);
+                }
             }
 
             console.log('✅ Push notification sent successfully:', result);
