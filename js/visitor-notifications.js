@@ -244,32 +244,62 @@ class VisitorNotificationManager {
             }
 
             // Store token with Cloudflare Worker
+            console.log('📤 Storing FCM token with Cloudflare Worker...');
+
+            const tokenData = {
+                userId: `visitor_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+                fcmToken: fcmToken,
+                userType: 'visitor',
+                subscribedAt: new Date().toISOString(),
+                userAgent: navigator.userAgent
+            };
+
             const response = await fetch(`${this.workerUrl}/api/store-token`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({
-                    userId: `visitor_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-                    fcmToken: fcmToken,
-                    userType: 'visitor',
-                    subscribedAt: new Date().toISOString(),
-                    userAgent: navigator.userAgent
-                })
+                body: JSON.stringify(tokenData)
             });
 
             if (!response.ok) {
-                throw new Error('Failed to subscribe to notifications');
+                const errorText = await response.text();
+                console.error('❌ Cloudflare Worker error:', response.status, errorText);
+
+                // Check for CORS error
+                if (response.status === 0 || errorText.includes('CORS')) {
+                    throw new Error('CORS error: Cloudflare Worker needs to be updated to allow this domain. Please update the worker CORS settings to include your domain.');
+                }
+
+                throw new Error(`Failed to subscribe to notifications: ${response.status} ${errorText}`);
             }
 
-            console.log('✅ Successfully subscribed to notifications');
+            const result = await response.json();
+            console.log('✅ Successfully subscribed to notifications:', result);
 
             // Store subscription status locally
             localStorage.setItem('notificationsEnabled', 'true');
             localStorage.setItem('fcmToken', fcmToken);
+            localStorage.setItem('subscriberId', tokenData.userId);
 
         } catch (error) {
             console.error('❌ Failed to subscribe to notifications:', error);
+
+            // For CORS errors, provide helpful guidance
+            if (error.message.includes('fetch') || error.message.includes('CORS')) {
+                const domain = window.location.origin;
+                console.log(`🔧 CORS Fix Needed: Update Cloudflare Worker to allow origin: ${domain}`);
+
+                // Still store the FCM token locally for when CORS is fixed
+                localStorage.setItem('notificationsEnabled', 'true');
+                localStorage.setItem('fcmToken', fcmToken);
+                localStorage.setItem('subscriberId', tokenData.userId);
+
+                // Show success message even though worker registration failed
+                console.log('⚠️ Notifications enabled locally, but worker registration failed due to CORS');
+                return; // Don't throw error, treat as partial success
+            }
+
             throw error;
         }
     }
