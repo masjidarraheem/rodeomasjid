@@ -15,6 +15,14 @@ class VisitorNotificationManager {
         if (this.isInitialized) return;
 
         try {
+            // Check for service worker support
+            if (!('serviceWorker' in navigator)) {
+                throw new Error('Service Worker not supported');
+            }
+
+            // Register Firebase service worker first
+            await this.registerServiceWorker();
+
             // Initialize Firebase for main website
             const firebaseConfig = {
                 apiKey: window.ENV?.FIREBASE_API_KEY || "your-api-key",
@@ -41,6 +49,41 @@ class VisitorNotificationManager {
             console.log('✅ Visitor notifications initialized');
         } catch (error) {
             console.error('❌ Failed to initialize visitor notifications:', error);
+            throw error;
+        }
+    }
+
+    async registerServiceWorker() {
+        try {
+            console.log('🔧 Registering Firebase service worker...');
+
+            // First check if service worker file exists
+            try {
+                const response = await fetch('/firebase-messaging-sw.js', { method: 'HEAD' });
+                if (!response.ok) {
+                    throw new Error(`Service worker file not found: ${response.status}`);
+                }
+                console.log('✅ Service worker file found');
+            } catch (fetchError) {
+                console.error('❌ Service worker file check failed:', fetchError);
+                throw new Error('Firebase service worker file not accessible');
+            }
+
+            // Register the Firebase messaging service worker
+            const registration = await navigator.serviceWorker.register('/firebase-messaging-sw.js', {
+                scope: '/'
+            });
+
+            console.log('✅ Service Worker registered successfully:', registration);
+
+            // Wait for service worker to be active or ready
+            await navigator.serviceWorker.ready;
+            console.log('✅ Service Worker is ready');
+
+            return registration;
+        } catch (error) {
+            console.error('❌ Service Worker registration failed:', error);
+            throw new Error('Failed to register service worker: ' + error.message);
         }
     }
 
@@ -173,10 +216,28 @@ class VisitorNotificationManager {
                 await this.initialize();
             }
 
-            // Get FCM token
+            // Ensure service worker is ready
+            if ('serviceWorker' in navigator) {
+                const registration = await navigator.serviceWorker.ready;
+                console.log('✅ Service Worker is ready:', registration);
+            }
+
+            // Get FCM token with proper service worker registration
+            console.log('🔑 Getting FCM token...');
+            const swRegistration = await navigator.serviceWorker.getRegistration('/firebase-messaging-sw.js');
+
+            if (!swRegistration) {
+                throw new Error('Service worker registration not found');
+            }
+
+            console.log('🔧 Using service worker registration:', swRegistration);
+
             const fcmToken = await getToken(this.messaging, {
-                vapidKey: this.vapidKey
+                vapidKey: this.vapidKey,
+                serviceWorkerRegistration: swRegistration
             });
+
+            console.log('🔑 FCM token retrieved:', fcmToken ? 'Success' : 'Failed');
 
             if (!fcmToken) {
                 throw new Error('Failed to get FCM token');
