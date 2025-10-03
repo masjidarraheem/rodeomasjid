@@ -8,12 +8,12 @@ importScripts('https://www.gstatic.com/firebasejs/10.7.1/firebase-messaging-comp
 // Firebase configuration (must match main app config)
 // Note: These values are public and safe to include in service worker
 const firebaseConfig = {
-  apiKey: "AIzaSyBXh8_wVQGCqO8QN0TMqQdZ2vZ8bYDYEyY",
-  authDomain: "rodeomasjid.firebaseapp.com",
-  projectId: "rodeomasjid",
-  storageBucket: "rodeomasjid.appspot.com",
-  messagingSenderId: "123456789012", // This will be replaced by build process
-  appId: "1:123456789012:web:abc123def456"  // This will be replaced by build process
+  apiKey: "PLACEHOLDER_FIREBASE_API_KEY",
+  authDomain: "PLACEHOLDER_FIREBASE_AUTH_DOMAIN",
+  projectId: "PLACEHOLDER_FIREBASE_PROJECT_ID",
+  storageBucket: "PLACEHOLDER_FIREBASE_STORAGE_BUCKET",
+  messagingSenderId: "PLACEHOLDER_FIREBASE_MESSAGING_SENDER_ID",
+  appId: "PLACEHOLDER_FIREBASE_APP_ID"
 }
 
 // Initialize Firebase

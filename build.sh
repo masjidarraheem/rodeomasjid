@@ -41,5 +41,15 @@ window.ENV = {
 };
 EOF
 
+# Update Firebase service worker with environment variables
+echo "🔧 Updating Firebase service worker..."
+sed -i "s/PLACEHOLDER_FIREBASE_API_KEY/${FIREBASE_API_KEY}/g" firebase-messaging-sw.js
+sed -i "s/PLACEHOLDER_FIREBASE_AUTH_DOMAIN/${FIREBASE_AUTH_DOMAIN}/g" firebase-messaging-sw.js
+sed -i "s/PLACEHOLDER_FIREBASE_PROJECT_ID/${FIREBASE_PROJECT_ID}/g" firebase-messaging-sw.js
+sed -i "s/PLACEHOLDER_FIREBASE_STORAGE_BUCKET/${FIREBASE_STORAGE_BUCKET}/g" firebase-messaging-sw.js
+sed -i "s/PLACEHOLDER_FIREBASE_MESSAGING_SENDER_ID/${FIREBASE_MESSAGING_SENDER_ID}/g" firebase-messaging-sw.js
+sed -i "s/PLACEHOLDER_FIREBASE_APP_ID/${FIREBASE_APP_ID}/g" firebase-messaging-sw.js
+
 echo "✅ Environment variables injected successfully!"
+echo "✅ Firebase service worker updated!"
 echo "📦 Main website ready for deployment"
