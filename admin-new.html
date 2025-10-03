@@ -911,13 +911,189 @@
         // Initialize Firebase directly
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
         import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
-        import { getFirestore, collection, addDoc, getDocs, query, orderBy, limit, where, Timestamp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+        import { getFirestore, collection, addDoc, getDocs, query, orderBy, limit, where, Timestamp, updateDoc, doc } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+        import { getMessaging, getToken, onMessage } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-messaging.js';
 
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
+        const messaging = getMessaging(app);
 
         console.log('Firebase initialized with config:', app.options);
+
+        // FCM Push Notification Manager
+        class FCMPushManager {
+            constructor(workerUrl, apiKey, vapidKey) {
+                this.workerUrl = workerUrl;
+                this.apiKey = apiKey;
+                this.vapidKey = vapidKey;
+                this.messaging = messaging;
+                this.isInitialized = false;
+            }
+
+            async initialize() {
+                if (this.isInitialized) return this.messaging;
+
+                if (!('serviceWorker' in navigator) || !('Notification' in window)) {
+                    throw new Error('Push notifications not supported in this browser');
+                }
+
+                try {
+                    this.isInitialized = true;
+
+                    // Handle foreground messages
+                    onMessage(this.messaging, (payload) => {
+                        console.log('Foreground message:', payload);
+                        this.showNotificationBanner(payload.notification?.title, payload.notification?.body);
+                    });
+
+                    return this.messaging;
+                } catch (error) {
+                    console.error('FCM initialization failed:', error);
+                    throw new Error('Failed to initialize push notifications');
+                }
+            }
+
+            async requestPermissionAndSubscribe(userId) {
+                try {
+                    await this.initialize();
+
+                    // Request permission
+                    const permission = await Notification.requestPermission();
+                    if (permission !== 'granted') {
+                        throw new Error('Notification permission denied. Please enable notifications in your browser settings.');
+                    }
+
+                    // Get FCM token
+                    const fcmToken = await getToken(this.messaging, {
+                        vapidKey: this.vapidKey
+                    });
+
+                    if (!fcmToken) {
+                        throw new Error('Failed to get FCM token. Please try again.');
+                    }
+
+                    // Store token in Cloudflare Worker
+                    const response = await fetch(`${this.workerUrl}/api/store-token`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            userId: userId,
+                            fcmToken: fcmToken
+                        })
+                    });
+
+                    const result = await response.json();
+
+                    if (!response.ok) {
+                        throw new Error(result.error || 'Failed to store FCM token');
+                    }
+
+                    console.log('✅ Push notifications enabled successfully');
+                    return fcmToken;
+
+                } catch (error) {
+                    console.error('❌ Push notification setup failed:', error);
+                    throw error;
+                }
+            }
+
+            async sendPushNotification(title, message, priority = 'normal') {
+                try {
+                    const response = await fetch(`${this.workerUrl}/api/send-push`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${this.apiKey}`
+                        },
+                        body: JSON.stringify({
+                            title: title,
+                            message: message,
+                            priority: priority
+                        })
+                    });
+
+                    const result = await response.json();
+
+                    if (!response.ok) {
+                        throw new Error(result.error || 'Failed to send push notification');
+                    }
+
+                    return result;
+
+                } catch (error) {
+                    console.error('❌ Push notification sending failed:', error);
+                    throw error;
+                }
+            }
+
+            async getSubscriberCount() {
+                try {
+                    const response = await fetch(`${this.workerUrl}/api/stats`, {
+                        headers: {
+                            'Authorization': `Bearer ${this.apiKey}`
+                        }
+                    });
+
+                    if (!response.ok) {
+                        throw new Error('Failed to get subscriber count');
+                    }
+
+                    const data = await response.json();
+                    return data.subscriberCount;
+
+                } catch (error) {
+                    console.error('❌ Failed to get subscriber count:', error);
+                    return 0;
+                }
+            }
+
+            showNotificationBanner(title, message) {
+                // Show in-app notification for foreground messages
+                const banner = document.createElement('div');
+                banner.style.cssText = `
+                    position: fixed; top: 20px; right: 20px; z-index: 10000;
+                    background: var(--primary); color: white; padding: 16px;
+                    border-radius: 8px; box-shadow: var(--shadow-lg);
+                    max-width: 300px; font-size: 14px;
+                `;
+                banner.innerHTML = `
+                    <div style="font-weight: 600; margin-bottom: 4px;">${title}</div>
+                    <div>${message}</div>
+                `;
+
+                document.body.appendChild(banner);
+
+                setTimeout(() => {
+                    banner.remove();
+                }, 5000);
+            }
+
+            async unsubscribe(userId) {
+                try {
+                    const response = await fetch(`${this.workerUrl}/api/remove-token/${userId}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'Authorization': `Bearer ${this.apiKey}`
+                        }
+                    });
+
+                    return response.ok;
+                } catch (error) {
+                    console.error('❌ Unsubscribe failed:', error);
+                    return false;
+                }
+            }
+        }
+
+        // Initialize FCM Push Manager with GitHub environment variables
+        const fcmPushManager = new FCMPushManager(
+            window.ENV?.CLOUDFLARE_WORKER_URL || 'https://masjid-push-notifications.rodeomasjid.workers.dev',
+            window.ENV?.PUSH_API_KEY || 'default-api-key', // This will be replaced by GitHub build process
+            window.ENV?.VAPID_KEY || 'BIJLDSsosAUFW4g-r0XLtd9t7_AMDPAnj0iOES6B0ySsPLc7H3mI8Xg1y4eFcqxqyRC6j5Pod3ac8uzdAAOtK44'
+        );
 
         class AdminPanelNew {
             constructor() {
@@ -1057,6 +1233,48 @@
                 // Setup all app event listeners after app is shown
                 this.setupUserMenu();
                 this.setupAppEventListeners();
+
+                // Initialize push notifications after app is fully loaded
+                setTimeout(async () => {
+                    await this.initializePushNotifications();
+                }, 1000);
+            }
+
+            // Add this method to initialize push notifications after login
+            async initializePushNotifications() {
+                try {
+                    if (!this.currentUser) {
+                        console.log('❌ No user logged in, skipping push notifications');
+                        return;
+                    }
+
+                    console.log('🔔 Initializing push notifications...');
+
+                    // Request permission and subscribe
+                    await fcmPushManager.requestPermissionAndSubscribe(this.currentUser.uid);
+
+                    // Get and display subscriber count
+                    const count = await fcmPushManager.getSubscriberCount();
+                    console.log(`📊 Current subscribers: ${count}`);
+
+                    // You can show this count in the UI if desired
+                    this.updateSubscriberCount(count);
+
+                } catch (error) {
+                    console.error('⚠️ Push notification setup failed (non-critical):', error.message);
+                    // Don't break the app if push notifications fail
+                    this.showNotificationSetupError(error.message);
+                }
+            }
+
+            updateSubscriberCount(count) {
+                // Optional: Update UI to show subscriber count
+                console.log(`📱 Push notification subscribers: ${count}`);
+            }
+
+            showNotificationSetupError(message) {
+                // Optional: Show user-friendly message about push notifications
+                console.log(`ℹ️ Push notifications unavailable: ${message}`);
             }
 
             setupUserMenu() {
@@ -1251,6 +1469,20 @@
                 modalBody.innerHTML = content;
                 modal.style.display = 'flex';
 
+                // Setup form handlers for announcements
+                if (action === 'new-announcement') {
+                    setTimeout(() => {
+                        this.updatePushNotificationInfo();
+                        const announcementForm = document.getElementById('announcementForm');
+                        if (announcementForm) {
+                            announcementForm.onsubmit = async (e) => {
+                                e.preventDefault();
+                                await this.handleAnnouncementSubmission(e);
+                            };
+                        }
+                    }, 100);
+                }
+
                 // Setup form handlers for add board member
                 if (action === 'add-board-member') {
                     setTimeout(() => {
@@ -1305,6 +1537,20 @@
                             <label for="announcementExpiry">Expires On (Optional)</label>
                             <input type="datetime-local" id="announcementExpiry" class="form-input">
                         </div>
+
+                        <!-- Push Notification Section -->
+                        <div class="form-group" style="background: #f0f9ff; padding: 16px; border-radius: 8px; border: 1px solid #0ea5e9;">
+                            <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 8px;">
+                                <input type="checkbox" id="sendPushNotification" style="width: auto;">
+                                <label for="sendPushNotification" style="margin: 0; font-weight: 600; color: #0369a1;">
+                                    📱 Send push notification
+                                </label>
+                            </div>
+                            <div id="pushNotificationInfo" style="color: #0369a1; font-size: 13px;">
+                                Loading subscriber count...
+                            </div>
+                        </div>
+
                         <button type="submit" class="btn btn-primary">Publish Announcement</button>
                     </form>
                 `;
@@ -1427,6 +1673,102 @@
 
             closeModal() {
                 document.getElementById('actionModal').style.display = 'none';
+            }
+
+            // Update push notification info in announcement form
+            async updatePushNotificationInfo() {
+                try {
+                    const count = await fcmPushManager.getSubscriberCount();
+                    const infoDiv = document.getElementById('pushNotificationInfo');
+
+                    if (infoDiv) {
+                        if (count > 0) {
+                            infoDiv.innerHTML = `✅ Will notify ${count} subscriber${count !== 1 ? 's' : ''}`;
+                            infoDiv.style.color = '#059669';
+                        } else {
+                            infoDiv.innerHTML = '⚠️ No subscribers yet. Users need to enable notifications first.';
+                            infoDiv.style.color = '#d97706';
+                        }
+                    }
+                } catch (error) {
+                    const infoDiv = document.getElementById('pushNotificationInfo');
+                    if (infoDiv) {
+                        infoDiv.innerHTML = '❌ Unable to load subscriber count';
+                        infoDiv.style.color = '#dc2626';
+                    }
+                }
+            }
+
+            // Handle announcement form submission
+            async handleAnnouncementSubmission(event) {
+                try {
+                    const sendPush = document.getElementById('sendPushNotification')?.checked || false;
+
+                    // Create announcement data
+                    const announcementData = {
+                        title: document.getElementById('announcementTitle').value,
+                        message: document.getElementById('announcementMessage').value,
+                        priority: document.getElementById('announcementPriority').value,
+                        expiresAt: document.getElementById('announcementExpiry').value || null,
+                        createdAt: new Date(),
+                        publishedBy: this.currentUser?.email || 'admin',
+                        isActive: true
+                    };
+
+                    // 1. Save announcement to Firebase Firestore
+                    console.log('💾 Saving announcement to Firebase...');
+                    const docRef = await addDoc(collection(db, 'announcements'), announcementData);
+
+                    // 2. Send push notification if requested
+                    if (sendPush) {
+                        console.log('📤 Sending push notification...');
+
+                        try {
+                            const pushResult = await fcmPushManager.sendPushNotification(
+                                announcementData.title,
+                                announcementData.message,
+                                announcementData.priority
+                            );
+
+                            console.log('✅ Push notification result:', pushResult);
+
+                            // 3. Update announcement with push status
+                            await updateDoc(docRef, {
+                                pushSent: true,
+                                pushSentAt: new Date(),
+                                pushRecipients: pushResult.sent,
+                                pushFailed: pushResult.failed
+                            });
+
+                            this.showSuccess(`✅ Announcement published and sent to ${pushResult.sent} subscribers!`);
+
+                        } catch (pushError) {
+                            console.error('⚠️ Push notification failed:', pushError);
+
+                            // Update with failed status
+                            await updateDoc(docRef, {
+                                pushSent: false,
+                                pushError: pushError.message,
+                                pushAttemptedAt: new Date()
+                            });
+
+                            this.showSuccess('✅ Announcement published (push notification failed)');
+                            this.showError(`⚠️ Push notification error: ${pushError.message}`);
+                        }
+                    } else {
+                        this.showSuccess('✅ Announcement published successfully!');
+                    }
+
+                    // Close modal and refresh if needed
+                    this.closeModal();
+                    if (typeof this.loadAnnouncementsList === 'function') {
+                        this.loadAnnouncementsList();
+                    }
+
+                } catch (error) {
+                    console.error('❌ Failed to publish announcement:', error);
+                    this.showError('❌ Failed to publish announcement. Please try again.');
+                }
             }
 
             switchTab(tab) {

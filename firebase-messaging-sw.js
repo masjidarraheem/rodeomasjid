@@ -1,0 +1,122 @@
+// Firebase Cloud Messaging Service Worker
+// Handles background push notifications
+
+// Import Firebase scripts
+importScripts('https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js')
+importScripts('https://www.gstatic.com/firebasejs/10.7.1/firebase-messaging-compat.js')
+
+// Firebase configuration (must match main app config)
+// Note: These values are public and safe to include in service worker
+const firebaseConfig = {
+  apiKey: "AIzaSyBXh8_wVQGCqO8QN0TMqQdZ2vZ8bYDYEyY",
+  authDomain: "rodeomasjid.firebaseapp.com",
+  projectId: "rodeomasjid",
+  storageBucket: "rodeomasjid.appspot.com",
+  messagingSenderId: "123456789012", // This will be replaced by build process
+  appId: "1:123456789012:web:abc123def456"  // This will be replaced by build process
+}
+
+// Initialize Firebase
+firebase.initializeApp(firebaseConfig)
+
+// Initialize Firebase Cloud Messaging
+const messaging = firebase.messaging()
+
+// Handle background messages when app is not in focus
+messaging.onBackgroundMessage((payload) => {
+  console.log('[firebase-messaging-sw.js] Received background message:', payload)
+
+  // Customize notification here
+  const notificationTitle = payload.notification?.title || 'Masjid Ar-Raheem'
+  const notificationOptions = {
+    body: payload.notification?.body || 'New announcement available',
+    icon: '/icons/icon-192.png',
+    badge: '/icons/badge-72.png',
+    tag: 'masjid-announcement', // Replaces previous notifications with same tag
+    renotify: true, // Show notification even if tag exists
+    requireInteraction: false, // Don't require user interaction to dismiss
+    data: {
+      click_action: payload.data?.url || 'https://masjidarraheem.github.io',
+      priority: payload.data?.priority || 'normal',
+      timestamp: payload.data?.timestamp || Date.now()
+    },
+    actions: [
+      {
+        action: 'view',
+        title: 'View',
+        icon: '/icons/icon-32.png'
+      },
+      {
+        action: 'dismiss',
+        title: 'Dismiss',
+        icon: '/icons/icon-32.png'
+      }
+    ]
+  }
+
+  // Show the notification
+  return self.registration.showNotification(notificationTitle, notificationOptions)
+})
+
+// Handle notification clicks
+self.addEventListener('notificationclick', (event) => {
+  console.log('[firebase-messaging-sw.js] Notification clicked:', event)
+
+  event.notification.close()
+
+  // Handle action buttons
+  if (event.action === 'dismiss') {
+    return // Just close the notification
+  }
+
+  // Default action or 'view' action - open the website
+  const clickAction = event.notification.data?.click_action || 'https://masjidarraheem.github.io'
+
+  event.waitUntil(
+    clients.matchAll({
+      type: 'window',
+      includeUncontrolled: true
+    }).then((clientList) => {
+      // If a window is already open, focus it
+      for (const client of clientList) {
+        if (client.url.includes('masjidarraheem.github.io') && 'focus' in client) {
+          return client.focus()
+        }
+      }
+
+      // If no window is open, open a new one
+      if (clients.openWindow) {
+        return clients.openWindow(clickAction)
+      }
+    })
+  )
+})
+
+// Handle push events (backup for when onBackgroundMessage doesn't fire)
+self.addEventListener('push', (event) => {
+  console.log('[firebase-messaging-sw.js] Push event received:', event)
+
+  if (event.data) {
+    try {
+      const payload = event.data.json()
+      console.log('[firebase-messaging-sw.js] Push data:', payload)
+
+      const notificationTitle = payload.notification?.title || 'Masjid Ar-Raheem'
+      const notificationOptions = {
+        body: payload.notification?.body || 'New announcement',
+        icon: '/icons/icon-192.png',
+        badge: '/icons/badge-72.png',
+        tag: 'masjid-announcement',
+        data: payload.data || {}
+      }
+
+      event.waitUntil(
+        self.registration.showNotification(notificationTitle, notificationOptions)
+      )
+    } catch (error) {
+      console.error('[firebase-messaging-sw.js] Error parsing push data:', error)
+    }
+  }
+})
+
+console.log('[firebase-messaging-sw.js] Service Worker loaded successfully')
