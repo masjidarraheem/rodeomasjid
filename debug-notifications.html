@@ -13,9 +13,11 @@
 
     <pre id="output"></pre>
 
+    <script src="js/env.js"></script>
     <script>
         const workerUrl = 'https://masjid-push-notifications.rodeomasjid.workers.dev';
-        const apiKey = window.localStorage.getItem('adminApiKey') || 'masjid_push_2025_secure_xyz789';
+        // Use environment API key from build process, no hardcoded fallback
+        const apiKey = window.ENV?.PUSH_API_KEY;
         const output = document.getElementById('output');
 
         function log(message) {
@@ -24,6 +26,12 @@
 
         document.getElementById('checkSubscribers').onclick = async () => {
             log('\n=== Checking Subscriber Count ===');
+
+            if (!apiKey) {
+                log('❌ No API key available! Environment variables not loaded.');
+                return;
+            }
+
             try {
                 const response = await fetch(`${workerUrl}/api/stats`, {
                     headers: { 'Authorization': `Bearer ${apiKey}` }

@@ -4,9 +4,9 @@ import { getToken, onMessage } from 'https://www.gstatic.com/firebasejs/10.7.1/f
 
 class FCMPushManager {
     constructor() {
-        this.workerUrl = window.ENV?.CLOUDFLARE_WORKER_URL || 'https://masjid-push-notifications.rodeomasjid.workers.dev';
+        this.workerUrl = window.ENV?.CLOUDFLARE_WORKER_URL;
         this.apiKey = window.ENV?.PUSH_API_KEY; // No fallback - must come from environment
-        this.vapidKey = window.ENV?.VAPID_KEY || 'BIJLDSsosAUFW4g-r0XLtd9t7_AMDPAnj0iOES6B0ySsPLc7H3mI8Xg1y4eFcqxqyRC6j5Pod3ac8uzdAAOtK44';
+        this.vapidKey = window.ENV?.VAPID_KEY;
         this.messaging = messaging;
         this.isInitialized = false;
 
