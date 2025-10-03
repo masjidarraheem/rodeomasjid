@@ -1015,6 +1015,19 @@
                             </select>
                         </div>
 
+                        <!-- Push Notification Section -->
+                        <div class="form-group" style="background: #f0f9ff; padding: 16px; border-radius: 8px; border: 1px solid #0ea5e9; margin-top: 16px;">
+                            <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 8px;">
+                                <input type="checkbox" id="sendPushNotification" style="width: auto; margin: 0;">
+                                <label for="sendPushNotification" style="margin: 0; font-weight: 600; color: #0369a1; cursor: pointer;">
+                                    📱 Send push notification
+                                </label>
+                            </div>
+                            <div id="pushNotificationInfo" style="color: #0369a1; font-size: 13px;">
+                                Loading subscriber count...
+                            </div>
+                        </div>
+
                         <button type="submit" class="btn btn-primary">Add Announcement</button>
                         <button type="button" id="cancelAnnouncementEdit" class="btn" style="background: #ccc; display: none;">Cancel Edit</button>
                     </form>

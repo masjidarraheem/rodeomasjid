@@ -1,7 +1,0 @@
-# Ignore files we don't need in the container
-build.sh
-README.md
-docker-compose.yml
-env.js
-public/
-src/
