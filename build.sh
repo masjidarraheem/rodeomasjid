@@ -36,7 +36,7 @@ window.ENV = {
   FIREBASE_APP_ID: "${FIREBASE_APP_ID}",
   // Push notification configuration
   CLOUDFLARE_WORKER_URL: "${CLOUDFLARE_WORKER_URL:-https://masjid-push-notifications.rodeomasjid.workers.dev}",
-  PUSH_API_KEY: "${PUSH_API_KEY:-default-api-key}",
+  PUSH_API_KEY: "${PUSH_API_KEY}",
   VAPID_KEY: "${VAPID_KEY:-BIJLDSsosAUFW4g-r0XLtd9t7_AMDPAnj0iOES6B0ySsPLc7H3mI8Xg1y4eFcqxqyRC6j5Pod3ac8uzdAAOtK44}"
 };
 EOF
