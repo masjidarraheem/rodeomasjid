@@ -5,7 +5,7 @@ import { getToken, onMessage } from 'https://www.gstatic.com/firebasejs/10.7.1/f
 class FCMPushManager {
     constructor() {
         this.workerUrl = window.ENV?.CLOUDFLARE_WORKER_URL || 'https://masjid-push-notifications.rodeomasjid.workers.dev';
-        this.apiKey = window.ENV?.PUSH_API_KEY || 'masjid_push_2025_secure_xyz789'; // Use actual API key as fallback
+        this.apiKey = window.ENV?.PUSH_API_KEY; // No fallback - must come from environment
         this.vapidKey = window.ENV?.VAPID_KEY || 'BIJLDSsosAUFW4g-r0XLtd9t7_AMDPAnj0iOES6B0ySsPLc7H3mI8Xg1y4eFcqxqyRC6j5Pod3ac8uzdAAOtK44';
         this.messaging = messaging;
         this.isInitialized = false;
@@ -13,8 +13,15 @@ class FCMPushManager {
         // Debug: Log what we're using
         console.log('🔧 FCM Push Manager initialized with:');
         console.log('  Worker URL:', this.workerUrl);
-        console.log('  API Key (first 10 chars):', this.apiKey?.substring(0, 10) + '...');
-        console.log('  Using placeholder env?', window.ENV?.PUSH_API_KEY === 'PLACEHOLDER_PUSH_API_KEY' ? '❌ YES (using fallback)' : '✅ NO (using env)');
+        console.log('  API Key status:', this.apiKey ? (this.apiKey === 'PLACEHOLDER_PUSH_API_KEY' ? '❌ PLACEHOLDER (build failed)' : '✅ Set from environment') : '❌ MISSING');
+        console.log('  VAPID Key status:', this.vapidKey ? '✅ Available' : '❌ Missing');
+
+        // Validate required environment variables
+        if (!this.apiKey || this.apiKey === 'PLACEHOLDER_PUSH_API_KEY') {
+            console.error('❌ PUSH_API_KEY not set! Push notifications will fail.');
+            console.error('   Make sure GitHub repository has PUSH_API_KEY secret set.');
+            console.error('   Current value:', this.apiKey);
+        }
     }
 
     async initialize() {
@@ -88,6 +95,11 @@ class FCMPushManager {
 
     async sendPushNotification(title, message, priority = 'normal') {
         try {
+            // Validate API key before attempting to send
+            if (!this.apiKey || this.apiKey === 'PLACEHOLDER_PUSH_API_KEY') {
+                throw new Error('Push notification API key not configured. Please set PUSH_API_KEY in GitHub repository secrets and redeploy.');
+            }
+
             console.log('📤 Sending push notification:', { title, message, priority });
             console.log('🔗 Worker URL:', this.workerUrl);
             console.log('🔑 Using API Key:', this.apiKey?.substring(0, 10) + '...');
