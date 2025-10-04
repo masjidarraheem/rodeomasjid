@@ -57,6 +57,14 @@ class VisitorNotificationManager {
         try {
             console.log('🔧 Registering Firebase service worker...');
 
+            // Check if service worker is already registered to prevent iOS duplicates
+            const existingRegistration = await navigator.serviceWorker.getRegistration('/firebase-messaging-sw.js');
+            if (existingRegistration) {
+                console.log('✅ Service Worker already registered, reusing:', existingRegistration);
+                await navigator.serviceWorker.ready;
+                return existingRegistration;
+            }
+
             // First check if service worker file exists
             try {
                 const response = await fetch('/firebase-messaging-sw.js', { method: 'HEAD' });
@@ -69,9 +77,10 @@ class VisitorNotificationManager {
                 throw new Error('Firebase service worker file not accessible');
             }
 
-            // Register the Firebase messaging service worker
+            // Register the Firebase messaging service worker with update check
             const registration = await navigator.serviceWorker.register('/firebase-messaging-sw.js', {
-                scope: '/'
+                scope: '/',
+                updateViaCache: 'none' // Ensure updates are fetched for iOS
             });
 
             console.log('✅ Service Worker registered successfully:', registration);

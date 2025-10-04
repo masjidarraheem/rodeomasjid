@@ -33,12 +33,14 @@ messaging.onBackgroundMessage((payload) => {
     icon: '/icons/icon-192.png',
     badge: '/icons/badge-72.png',
     tag: 'masjid-announcement', // Replaces previous notifications with same tag
-    renotify: true, // Show notification even if tag exists
+    renotify: false, // Don't renotify for same tag (prevents iOS duplicates)
     requireInteraction: false, // Don't require user interaction to dismiss
+    silent: false, // Allow sound/vibration
     data: {
       click_action: payload.data?.url || 'https://rodeomasjid.org',
       priority: payload.data?.priority || 'normal',
-      timestamp: payload.data?.timestamp || Date.now()
+      timestamp: payload.data?.timestamp || Date.now(),
+      announcement: payload.data?.announcement || null
     },
     actions: [
       {
@@ -109,31 +111,7 @@ self.addEventListener('notificationclick', (event) => {
   )
 })
 
-// Handle push events (backup for when onBackgroundMessage doesn't fire)
-self.addEventListener('push', (event) => {
-  console.log('[firebase-messaging-sw.js] Push event received:', event)
-
-  if (event.data) {
-    try {
-      const payload = event.data.json()
-      console.log('[firebase-messaging-sw.js] Push data:', payload)
-
-      const notificationTitle = payload.notification?.title || 'Masjid Ar-Raheem'
-      const notificationOptions = {
-        body: payload.notification?.body || 'New announcement',
-        icon: '/icons/icon-192.png',
-        badge: '/icons/badge-72.png',
-        tag: 'masjid-announcement',
-        data: payload.data || {}
-      }
-
-      event.waitUntil(
-        self.registration.showNotification(notificationTitle, notificationOptions)
-      )
-    } catch (error) {
-      console.error('[firebase-messaging-sw.js] Error parsing push data:', error)
-    }
-  }
-})
+// Note: Removed generic 'push' event handler to prevent iOS Safari duplicate notifications
+// Firebase's onBackgroundMessage handles all push notifications properly
 
 console.log('[firebase-messaging-sw.js] Service Worker loaded successfully')
