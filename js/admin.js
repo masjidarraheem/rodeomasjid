@@ -1285,6 +1285,10 @@ class AdminPanel {
 
             const debugData = await response.json();
 
+            // Debug: Log the actual response structure
+            console.log('Debug response structure:', debugData);
+            debugResults.textContent += `Response structure logged to console\n`;
+
             let output = '=== FCM TOKEN ANALYSIS ===\n\n';
             output += `Total tokens found: ${debugData.summary?.totalTokens || debugData.tokens?.length || 0}\n\n`;
 
