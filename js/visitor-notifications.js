@@ -246,8 +246,18 @@ class VisitorNotificationManager {
             // Store token with Cloudflare Worker
             console.log('📤 Storing FCM token with Cloudflare Worker...');
 
+            // Generate or retrieve persistent visitor ID
+            let visitorId = localStorage.getItem('masjid_visitor_id');
+            if (!visitorId) {
+                visitorId = `visitor_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+                localStorage.setItem('masjid_visitor_id', visitorId);
+                console.log('🆔 Generated new visitor ID:', visitorId);
+            } else {
+                console.log('🆔 Using existing visitor ID:', visitorId);
+            }
+
             const tokenData = {
-                userId: `visitor_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+                userId: visitorId,
                 fcmToken: fcmToken,
                 userType: 'visitor',
                 subscribedAt: new Date().toISOString(),
