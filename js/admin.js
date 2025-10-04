@@ -1243,6 +1243,13 @@ class AdminPanel {
                 this.debugFCMTokens();
             });
         }
+
+        const wipeButton = document.getElementById('wipeTokens');
+        if (wipeButton) {
+            wipeButton.addEventListener('click', () => {
+                this.wipeAllTokens();
+            });
+        }
     }
 
     // Debug FCM Tokens for iOS duplication issue
@@ -1279,60 +1286,70 @@ class AdminPanel {
             const debugData = await response.json();
 
             let output = '=== FCM TOKEN ANALYSIS ===\n\n';
-            output += `Total tokens found: ${debugData.totalTokens || 0}\n\n`;
+            output += `Total tokens found: ${debugData.summary?.totalTokens || debugData.tokens?.length || 0}\n\n`;
 
             if (debugData.tokens && debugData.tokens.length > 0) {
-                // Group tokens by user patterns
+                // Group tokens by platform
                 const userGroups = {};
                 const duplicateGroups = {};
 
                 debugData.tokens.forEach(token => {
-                    const key = token.key || 'unknown';
-                    const data = token.data || {};
-
-                    // Look for potential user patterns
-                    const userAgent = data.userAgent || 'Unknown';
-                    const isIOS = userAgent.includes('iPhone') || userAgent.includes('iPad') || userAgent.includes('Safari');
-                    const isAndroid = userAgent.includes('Android');
-
-                    const platform = isIOS ? 'iOS' : (isAndroid ? 'Android' : 'Unknown');
+                    const userId = token.userId || 'unknown';
+                    const userAgent = token.userAgent || 'Unknown';
+                    const platform = token.platform || 'Unknown';
+                    const deviceInfo = token.deviceInfo || 'Unknown Device';
+                    const storedAt = token.storedAt ? new Date(token.storedAt).toLocaleString() : 'Unknown';
 
                     if (!userGroups[platform]) {
                         userGroups[platform] = [];
                     }
-                    userGroups[platform].push({ key, data, userAgent });
+                    userGroups[platform].push({
+                        userId,
+                        userAgent,
+                        platform,
+                        deviceInfo,
+                        storedAt,
+                        tokenPreview: token.tokenPreview || 'N/A'
+                    });
 
-                    // Check for potential duplicates (same IP, similar user agents, etc.)
-                    const fingerprint = `${data.ip || 'unknown'}_${platform}`;
+                    // Check for potential duplicates (same device info)
+                    const fingerprint = `${deviceInfo}_${platform}`;
                     if (!duplicateGroups[fingerprint]) {
                         duplicateGroups[fingerprint] = [];
                     }
-                    duplicateGroups[fingerprint].push({ key, data, userAgent });
+                    duplicateGroups[fingerprint].push({ userId, userAgent, platform, deviceInfo, storedAt });
                 });
 
                 // Report by platform
                 Object.keys(userGroups).forEach(platform => {
                     output += `--- ${platform} TOKENS (${userGroups[platform].length}) ---\n`;
                     userGroups[platform].forEach((token, index) => {
-                        output += `${index + 1}. Key: ${token.key}\n`;
-                        output += `   UserAgent: ${token.userAgent.substring(0, 80)}${token.userAgent.length > 80 ? '...' : ''}\n`;
-                        output += `   Timestamp: ${token.data.timestamp || 'Unknown'}\n`;
-                        output += `   IP: ${token.data.ip || 'Unknown'}\n\n`;
+                        output += `${index + 1}. User ID: ${token.userId}\n`;
+                        output += `   Device: ${token.deviceInfo}\n`;
+                        output += `   Token: ${token.tokenPreview}\n`;
+                        output += `   Registered: ${token.storedAt}\n`;
+                        output += `   User Agent: ${token.userAgent.substring(0, 100)}${token.userAgent.length > 100 ? '...' : ''}\n\n`;
                     });
                 });
 
                 // Report potential duplicates
                 output += '\n=== POTENTIAL DUPLICATES ===\n';
+                let duplicatesFound = false;
                 Object.keys(duplicateGroups).forEach(fingerprint => {
                     const group = duplicateGroups[fingerprint];
                     if (group.length > 1) {
+                        duplicatesFound = true;
                         output += `\n🔴 DUPLICATE GROUP: ${fingerprint} (${group.length} tokens)\n`;
                         group.forEach((token, index) => {
-                            output += `  ${index + 1}. ${token.key}\n`;
-                            output += `     UA: ${token.userAgent.substring(0, 60)}...\n`;
+                            output += `  ${index + 1}. ${token.userId} (${token.storedAt})\n`;
+                            output += `     Device: ${token.deviceInfo}\n`;
                         });
                     }
                 });
+
+                if (!duplicatesFound) {
+                    output += 'No duplicate devices detected.\n';
+                }
 
             } else {
                 output += 'No tokens found in storage.\n';
@@ -1345,6 +1362,71 @@ class AdminPanel {
         } finally {
             debugButton.disabled = false;
             debugButton.textContent = 'Analyze FCM Tokens';
+        }
+    }
+
+    // Wipe All FCM Tokens (Dangerous!)
+    async wipeAllTokens() {
+        const wipeButton = document.getElementById('wipeTokens');
+        const debugResults = document.getElementById('debugResults');
+
+        if (!wipeButton || !debugResults) return;
+
+        // Double confirmation for safety
+        const firstConfirm = confirm('⚠️ WARNING: This will DELETE ALL FCM tokens!\n\nAre you sure you want to proceed?\n\nThis action cannot be undone!');
+        if (!firstConfirm) return;
+
+        const secondConfirm = confirm('🚨 FINAL WARNING 🚨\n\nThis will permanently delete all notification subscribers.\n\nUsers will need to re-enable notifications.\n\nType "DELETE" and click OK to confirm:');
+        if (!secondConfirm) return;
+
+        wipeButton.disabled = true;
+        wipeButton.textContent = 'Wiping...';
+        wipeButton.style.background = '#6c757d';
+        debugResults.style.display = 'block';
+        debugResults.textContent = 'Initiating token wipe...\n';
+
+        try {
+            const apiKey = window.ENV?.PUSH_API_KEY;
+            if (!apiKey) {
+                throw new Error('Push API key not available');
+            }
+
+            debugResults.textContent += 'Calling Cloudflare Worker wipe endpoint...\n';
+
+            const response = await fetch('https://masjid-push-notifications.rodeomasjid.workers.dev/api/wipe-all-tokens', {
+                method: 'DELETE',
+                headers: {
+                    'Authorization': `Bearer ${apiKey}`,
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            if (!response.ok) {
+                throw new Error(`Wipe request failed: ${response.status} ${response.statusText}`);
+            }
+
+            const result = await response.json();
+
+            let output = '=== TOKEN WIPE COMPLETE ===\n\n';
+            output += `✅ Success: ${result.success ? 'Yes' : 'No'}\n`;
+            output += `🗑️ Tokens Deleted: ${result.deleted}/${result.total}\n`;
+            output += `📅 Timestamp: ${new Date(result.timestamp).toLocaleString()}\n`;
+            output += `💬 Message: ${result.message}\n\n`;
+            output += '⚠️ All users will need to re-enable notifications on their devices.\n';
+            output += '📱 Refresh the debug analysis to verify the wipe was successful.';
+
+            debugResults.textContent = output;
+
+            // Update UI
+            this.showSuccess(`🗑️ All ${result.deleted} FCM tokens have been wiped successfully!`);
+
+        } catch (error) {
+            debugResults.textContent = `❌ Error wiping tokens: ${error.message}\n\nThis might mean:\n- API key issue\n- Network connectivity problem\n- Worker endpoint error`;
+            this.showError(`Failed to wipe tokens: ${error.message}`);
+        } finally {
+            wipeButton.disabled = false;
+            wipeButton.textContent = '🗑️ Wipe All Tokens';
+            wipeButton.style.background = '#dc3545';
         }
     }
 }
