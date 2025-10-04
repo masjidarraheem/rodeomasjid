@@ -65,6 +65,13 @@ class VisitorNotificationManager {
         try {
             console.log('🔧 Registering Firebase service worker...');
 
+            // Global flag to prevent multiple registrations
+            if (window.firebaseServiceWorkerRegistered) {
+                console.log('⚠️ Service Worker registration already in progress/completed');
+                return await navigator.serviceWorker.ready;
+            }
+            window.firebaseServiceWorkerRegistered = true;
+
             // Check if service worker is already registered to prevent iOS duplicates
             const existingRegistration = await navigator.serviceWorker.getRegistration('/firebase-messaging-sw.js');
             if (existingRegistration) {
@@ -391,20 +398,32 @@ class VisitorNotificationManager {
     }
 }
 
-// Initialize and start the visitor notification system
-const visitorNotifications = new VisitorNotificationManager();
+// Prevent duplicate initialization (iOS Safari fix)
+if (!window.visitorNotificationsInitialized) {
+    window.visitorNotificationsInitialized = true;
+
+    // Initialize and start the visitor notification system
+    const visitorNotifications = new VisitorNotificationManager();
+    window.visitorNotifications = visitorNotifications;
+
+    console.log('✅ VisitorNotificationManager initialized (singleton)');
+} else {
+    console.log('⚠️ VisitorNotificationManager already initialized, skipping duplicate');
+}
 
 // Start the process after page loads
 document.addEventListener('DOMContentLoaded', () => {
     // Wait a bit for the page to fully load, then check for notifications
     setTimeout(() => {
-        if (!visitorNotifications.isSubscribed()) {
-            visitorNotifications.checkAndPromptForNotifications();
-        } else {
-            // Already subscribed, just initialize for foreground messages
-            visitorNotifications.initialize();
+        if (window.visitorNotifications) {
+            if (!window.visitorNotifications.isSubscribed()) {
+                window.visitorNotifications.checkAndPromptForNotifications();
+            } else {
+                // Already subscribed, just initialize for foreground messages
+                window.visitorNotifications.initialize();
+            }
         }
     }, 3000); // Wait 3 seconds after page load
 });
 
-export default visitorNotifications;
+export default window.visitorNotifications;
