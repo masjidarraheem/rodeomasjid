@@ -23,8 +23,13 @@ class AnnouncementManager {
     async init() {
         console.log('[Announcements] Initializing...');
         this.setupServiceWorkerListener();
-        this.checkForNotificationClick();
+
+        // Load active announcements first, then check for notification clicks
         await this.loadActiveAnnouncement();
+
+        // After Firebase is initialized, check for notification click
+        this.checkForNotificationClick();
+
         this.setupEventHandlers();
         this.setupDraggable();
         this.setupNotificationBell();
@@ -447,22 +452,34 @@ class AnnouncementManager {
         const urlParams = new URLSearchParams(window.location.search);
         const announcementId = urlParams.get('showAnnouncement');
 
+        console.log('[Announcements] Checking for notification click...');
+        console.log('[Announcements] Current URL:', window.location.href);
+        console.log('[Announcements] URL parameters:', urlParams.toString());
+        console.log('[Announcements] Announcement ID from URL:', announcementId);
+
         if (announcementId) {
-            console.log('[Announcements] URL parameter indicates notification click for announcement:', announcementId);
+            console.log('[Announcements] 🎯 Notification click detected for announcement:', announcementId);
+
             // Remove the parameter from URL to clean it up
             const newUrl = new URL(window.location);
             newUrl.searchParams.delete('showAnnouncement');
             window.history.replaceState({}, document.title, newUrl);
 
+            console.log('[Announcements] Loading specific announcement by ID...');
             // Load and show the specific announcement
             this.loadSpecificAnnouncementById(announcementId);
+        } else {
+            console.log('[Announcements] No notification click detected');
         }
     }
 
     async loadSpecificAnnouncementById(announcementId) {
         try {
+            console.log('[Announcements] 🔍 Loading announcement from Firestore:', announcementId);
             const docRef = doc(db, 'announcements', announcementId);
             const docSnap = await getDoc(docRef);
+
+            console.log('[Announcements] Firestore query result exists:', docSnap.exists());
 
             if (docSnap.exists()) {
                 const announcement = {
@@ -470,21 +487,40 @@ class AnnouncementManager {
                     ...docSnap.data()
                 };
 
+                console.log('[Announcements] Found announcement:', {
+                    id: announcement.id,
+                    title: announcement.title,
+                    isActive: announcement.isActive,
+                    expiryDate: announcement.expiryDate
+                });
+
                 // Check if announcement is still active and not expired
                 if (announcement.isActive) {
                     const now = new Date();
-                    if (!announcement.expiryDate ||
-                        (announcement.expiryDate.toDate ? announcement.expiryDate.toDate() : new Date(announcement.expiryDate)) > now) {
+                    const isNotExpired = !announcement.expiryDate ||
+                        (announcement.expiryDate.toDate ? announcement.expiryDate.toDate() : new Date(announcement.expiryDate)) > now;
 
+                    console.log('[Announcements] Announcement active:', announcement.isActive);
+                    console.log('[Announcements] Announcement not expired:', isNotExpired);
+
+                    if (isNotExpired) {
+                        console.log('[Announcements] ✅ Showing specific announcement from notification');
                         this.showSpecificAnnouncement(announcement);
                         return;
+                    } else {
+                        console.log('[Announcements] ❌ Announcement is expired');
                     }
+                } else {
+                    console.log('[Announcements] ❌ Announcement is not active');
                 }
+            } else {
+                console.log('[Announcements] ❌ Announcement document does not exist in Firestore');
             }
 
             console.log('[Announcements] Specific announcement not found or expired:', announcementId);
         } catch (error) {
-            console.error('[Announcements] Error loading specific announcement:', error);
+            console.error('[Announcements] ❌ Error loading specific announcement:', error);
+            console.error('[Announcements] Error details:', error.message, error.stack);
         }
     }
 
