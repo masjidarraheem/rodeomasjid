@@ -124,6 +124,17 @@ a:hover {
     justify-content: space-between;
     align-items: center;
     height: 70px;
+    position: relative;
+}
+
+/* Center the brand absolutely on mobile */
+@media (max-width: 768px) {
+    .nav-brand {
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 1;
+    }
 }
 
 .nav-brand {
@@ -207,11 +218,19 @@ a:hover {
     box-shadow: var(--shadow-md);
 }
 
-/* Navigation Actions Container */
-.nav-actions {
+/* Navigation Left/Right Containers */
+.nav-left {
     display: flex;
     align-items: center;
-    gap: 12px;
+    min-width: 60px; /* Reserve space for bell icon */
+    z-index: 2;
+}
+
+.nav-right {
+    display: flex;
+    align-items: center;
+    min-width: 60px; /* Reserve space for hamburger */
+    z-index: 2;
 }
 
 /* Notification Bell Styles */
