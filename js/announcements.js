@@ -16,6 +16,7 @@ class AnnouncementManager {
         this.isMinimized = false;
         this.isDragging = false;
         this.dragOffset = { x: 0, y: 0 };
+        this.availableAnnouncements = [];
         this.init();
     }
 
@@ -26,6 +27,7 @@ class AnnouncementManager {
         await this.loadActiveAnnouncement();
         this.setupEventHandlers();
         this.setupDraggable();
+        this.setupNotificationBell();
         console.log('[Announcements] Initialization complete');
     }
 
@@ -44,32 +46,39 @@ class AnnouncementManager {
             if (!querySnapshot.empty) {
                 // Filter and sort announcements
                 const validAnnouncements = [];
+                const allValidAnnouncements = [];
                 const closedAnnouncements = this.getClosedAnnouncements();
-                
+
                 querySnapshot.forEach(doc => {
                     const announcement = doc.data();
-                    
+
                     // Check if announcement has expired
                     if (announcement.expiryDate) {
-                        const expiryDate = announcement.expiryDate.toDate ? 
-                            announcement.expiryDate.toDate() : 
+                        const expiryDate = announcement.expiryDate.toDate ?
+                            announcement.expiryDate.toDate() :
                             new Date(announcement.expiryDate);
-                        
+
                         if (expiryDate < now) {
                             return; // Skip expired
                         }
                     }
-                    
-                    // Check if user has already closed this announcement
-                    if (closedAnnouncements.includes(doc.id)) {
-                        return; // Skip closed
-                    }
-                    
-                    validAnnouncements.push({
+
+                    const announcementWithId = {
                         id: doc.id,
                         ...announcement
-                    });
+                    };
+
+                    // Add to all valid announcements (for bell count)
+                    allValidAnnouncements.push(announcementWithId);
+
+                    // Check if user has already closed this announcement (for auto-display)
+                    if (!closedAnnouncements.includes(doc.id)) {
+                        validAnnouncements.push(announcementWithId);
+                    }
                 });
+
+                // Store all available announcements for bell functionality
+                this.availableAnnouncements = allValidAnnouncements;
                 
                 // Sort by priority (high > medium > low) then by creation date
                 validAnnouncements.sort((a, b) => {
@@ -93,6 +102,9 @@ class AnnouncementManager {
                     this.displayAnnouncement();
                 }
             }
+
+            // Update notification bell regardless of whether announcements are displayed
+            this.updateNotificationBell();
         } catch (error) {
             console.error('Error loading announcements:', error);
         }
@@ -488,6 +500,65 @@ class AnnouncementManager {
         this.displayAnnouncement();
 
         console.log('[Announcements] Showing specific announcement from notification:', announcement.title);
+    }
+
+    setupNotificationBell() {
+        const bellButton = document.getElementById('notificationBell');
+        if (bellButton) {
+            bellButton.addEventListener('click', () => {
+                this.showAnnouncementFromBell();
+            });
+        }
+    }
+
+    updateNotificationBell() {
+        const bellButton = document.getElementById('notificationBell');
+        const countElement = document.getElementById('notificationCount');
+
+        if (!bellButton || !countElement) return;
+
+        const count = this.availableAnnouncements.length;
+
+        if (count > 0) {
+            bellButton.style.display = 'flex';
+            countElement.textContent = count;
+            countElement.style.display = 'flex';
+        } else {
+            bellButton.style.display = 'none';
+        }
+
+        console.log(`[Announcements] Updated notification bell: ${count} announcements available`);
+    }
+
+    showAnnouncementFromBell() {
+        console.log('[Announcements] Bell clicked - showing announcements');
+
+        // If there's already a current announcement displayed, show it
+        if (this.currentAnnouncement) {
+            this.expandAnnouncement();
+            return;
+        }
+
+        // Otherwise, find the highest priority available announcement
+        if (this.availableAnnouncements.length > 0) {
+            // Sort by priority and date to get the most important one
+            const sortedAnnouncements = [...this.availableAnnouncements].sort((a, b) => {
+                const priorityOrder = { high: 3, medium: 2, low: 1 };
+                const aPriority = priorityOrder[a.priority] || 1;
+                const bPriority = priorityOrder[b.priority] || 1;
+
+                if (aPriority !== bPriority) {
+                    return bPriority - aPriority; // Higher priority first
+                }
+
+                // If same priority, show newer first
+                const aDate = a.createdAt.toDate ? a.createdAt.toDate() : new Date(a.createdAt);
+                const bDate = b.createdAt.toDate ? b.createdAt.toDate() : new Date(b.createdAt);
+                return bDate - aDate;
+            });
+
+            this.showSpecificAnnouncement(sortedAnnouncements[0]);
+        }
     }
 }
 

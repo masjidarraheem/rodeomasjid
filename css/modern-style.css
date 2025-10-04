@@ -207,6 +207,53 @@ a:hover {
     box-shadow: var(--shadow-md);
 }
 
+/* Notification Bell Styles */
+.notification-bell {
+    position: relative;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 8px 12px;
+    border-radius: 8px;
+    color: var(--text-dark);
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.notification-bell:hover {
+    background: rgba(52, 155, 235, 0.1);
+    color: var(--primary-dark);
+}
+
+.notification-bell svg {
+    width: 20px;
+    height: 20px;
+}
+
+.notification-count {
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    background: var(--accent-color);
+    color: white;
+    border-radius: 50%;
+    min-width: 18px;
+    height: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 600;
+    line-height: 1;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.notification-count:empty {
+    display: none;
+}
+
 /* Hero Section */
 .hero {
     position: relative;
@@ -1137,6 +1184,12 @@ a:hover {
         font-size: 1rem;
         width: 100%;
         text-align: center;
+    }
+
+    .notification-bell {
+        padding: 12px 20px;
+        width: 100%;
+        justify-content: center;
     }
     
     .nav-menu.active {
