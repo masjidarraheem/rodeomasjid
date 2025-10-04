@@ -30,8 +30,10 @@ const MESSAGE_TIMEOUT = 5000; // 5 seconds
 messaging.onBackgroundMessage((payload) => {
   console.log('[firebase-messaging-sw.js] Received background message:', payload)
 
-  // Create unique message ID for deduplication
-  const messageId = payload.data?.timestamp || payload.notification?.title + Date.now();
+  // Create unique message ID for deduplication (more robust)
+  const messageId = payload.data?.timestamp ||
+                   (payload.notification?.title + payload.notification?.body).replace(/\s/g, '') +
+                   Math.floor(Date.now() / 1000); // Round to seconds for same-message deduplication
 
   // Check if we've already processed this message recently
   if (processedMessages.has(messageId)) {

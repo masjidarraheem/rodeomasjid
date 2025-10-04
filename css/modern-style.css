@@ -127,8 +127,8 @@ a:hover {
     position: relative;
 }
 
-/* Center the brand absolutely on mobile */
-@media (max-width: 768px) {
+/* Center the brand absolutely on mobile and tablet */
+@media (max-width: 1024px) {
     .nav-brand {
         position: absolute;
         left: 50%;
@@ -1121,7 +1121,7 @@ a:hover {
     }
 }
 
-@media (max-width: 768px) {
+@media (max-width: 1024px) {
     /* Prevent horizontal scroll on mobile */
     html, body {
         overflow-x: hidden !important;
@@ -1212,7 +1212,15 @@ a:hover {
         text-align: center;
     }
 
-    
+    .nav-donate-btn {
+        padding: 12px 20px;
+        font-size: 1rem;
+        width: 100%;
+        text-align: center;
+        margin-left: 0;
+        margin-top: 10px;
+    }
+
     .nav-menu.active {
         left: 0;
     }

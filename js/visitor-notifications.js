@@ -36,13 +36,21 @@ class VisitorNotificationManager {
             const app = initializeApp(firebaseConfig);
             this.messaging = getMessaging(app);
 
-            // Handle foreground messages
+            // Handle foreground messages (only when page is actually visible)
             onMessage(this.messaging, (payload) => {
                 console.log('Received foreground message:', payload);
-                this.showNotificationBanner(
-                    payload.notification?.title || 'New Announcement',
-                    payload.notification?.body || 'You have a new message from Masjid Ar-Raheem'
-                );
+
+                // Only show foreground notification if page is actually visible
+                // This prevents duplicate notifications on iOS Safari
+                if (document.visibilityState === 'visible' && !document.hidden) {
+                    console.log('Page is visible, showing foreground banner');
+                    this.showNotificationBanner(
+                        payload.notification?.title || 'New Announcement',
+                        payload.notification?.body || 'You have a new message from Masjid Ar-Raheem'
+                    );
+                } else {
+                    console.log('Page is hidden, letting service worker handle notification');
+                }
             });
 
             this.isInitialized = true;
