@@ -520,11 +520,25 @@ class AnnouncementManager {
         const count = this.availableAnnouncements.length;
 
         if (count > 0) {
+            // Show the bell button
             bellButton.style.display = 'flex';
             countElement.textContent = count;
             countElement.style.display = 'flex';
+
+            // Add a class to the li element to ensure proper mobile display
+            const bellLi = bellButton.closest('li');
+            if (bellLi) {
+                bellLi.style.display = 'block';
+            }
         } else {
+            // Hide the bell button
             bellButton.style.display = 'none';
+
+            // Hide the li element as well
+            const bellLi = bellButton.closest('li');
+            if (bellLi) {
+                bellLi.style.display = 'none';
+            }
         }
 
         console.log(`[Announcements] Updated notification bell: ${count} announcements available`);
