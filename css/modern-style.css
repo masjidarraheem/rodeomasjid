@@ -207,6 +207,13 @@ a:hover {
     box-shadow: var(--shadow-md);
 }
 
+/* Navigation Actions Container */
+.nav-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
 /* Notification Bell Styles */
 .notification-bell {
     position: relative;
@@ -1186,11 +1193,6 @@ a:hover {
         text-align: center;
     }
 
-    .notification-bell {
-        padding: 12px 20px;
-        width: 100%;
-        justify-content: center;
-    }
     
     .nav-menu.active {
         left: 0;
