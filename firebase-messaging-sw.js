@@ -22,9 +22,30 @@ firebase.initializeApp(firebaseConfig)
 // Initialize Firebase Cloud Messaging
 const messaging = firebase.messaging()
 
+// Message deduplication for iOS Safari
+const processedMessages = new Set();
+const MESSAGE_TIMEOUT = 5000; // 5 seconds
+
 // Handle background messages when app is not in focus
 messaging.onBackgroundMessage((payload) => {
   console.log('[firebase-messaging-sw.js] Received background message:', payload)
+
+  // Create unique message ID for deduplication
+  const messageId = payload.data?.timestamp || payload.notification?.title + Date.now();
+
+  // Check if we've already processed this message recently
+  if (processedMessages.has(messageId)) {
+    console.log('[firebase-messaging-sw.js] Duplicate message detected, ignoring:', messageId);
+    return;
+  }
+
+  // Mark message as processed
+  processedMessages.add(messageId);
+
+  // Clean up old message IDs after timeout
+  setTimeout(() => {
+    processedMessages.delete(messageId);
+  }, MESSAGE_TIMEOUT);
 
   // Customize notification here
   const notificationTitle = payload.notification?.title || 'Masjid Ar-Raheem'
