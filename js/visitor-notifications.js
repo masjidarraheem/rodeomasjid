@@ -137,8 +137,9 @@ class VisitorNotificationManager {
     }
 
     showNotificationPromptBanner() {
-        // Don't show if already shown in this session
-        if (sessionStorage.getItem('notificationPromptShown')) {
+        // Don't show if user has already enabled notifications or permanently dismissed
+        if (localStorage.getItem('notificationsEnabled') === 'true' ||
+            localStorage.getItem('notificationPromptDismissed') === 'true') {
             return;
         }
 
@@ -197,19 +198,13 @@ class VisitorNotificationManager {
             banner.remove();
         };
 
-        // Handle dismiss button
+        // Handle dismiss button - permanently dismiss
         document.getElementById('dismissNotifications').onclick = () => {
             banner.remove();
-            sessionStorage.setItem('notificationPromptShown', 'true');
+            localStorage.setItem('notificationPromptDismissed', 'true');
         };
 
-        // Auto-hide after 10 seconds
-        setTimeout(() => {
-            if (document.getElementById('notificationPromptBanner')) {
-                banner.remove();
-                sessionStorage.setItem('notificationPromptShown', 'true');
-            }
-        }, 10000);
+        // No auto-hide - banner stays until user takes action
     }
 
     async requestNotificationPermission() {
@@ -227,7 +222,7 @@ class VisitorNotificationManager {
                 this.showErrorMessage('Notifications disabled. You can enable them in your browser settings.');
             }
 
-            sessionStorage.setItem('notificationPromptShown', 'true');
+            // No need to set any dismissal flags here - user made their choice
         } catch (error) {
             console.error('❌ Error requesting notification permission:', error);
             this.showErrorMessage('Failed to enable notifications. Please try again.');
@@ -395,6 +390,12 @@ class VisitorNotificationManager {
     // Check if user is already subscribed
     isSubscribed() {
         return localStorage.getItem('notificationsEnabled') === 'true';
+    }
+
+    // Clear dismissal state (for testing/reset purposes)
+    resetNotificationPrompt() {
+        localStorage.removeItem('notificationPromptDismissed');
+        console.log('🔄 Notification prompt reset - will show again on next page load');
     }
 }
 
