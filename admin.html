@@ -1033,6 +1033,18 @@
                     </form>
                 </div>
 
+                <!-- Debug Section for iOS Notification Issue -->
+                <div class="form-section" style="background: #fff3cd; border: 1px solid #ffc107; border-radius: 8px; padding: 16px; margin-top: 20px;">
+                    <h3 style="color: #856404; margin-top: 0;">🔍 Debug: FCM Token Analysis</h3>
+                    <p style="color: #856404; font-size: 14px; margin-bottom: 16px;">
+                        This will help diagnose the iOS duplicate notification issue by checking KV storage for multiple tokens.
+                    </p>
+                    <button type="button" id="debugTokens" class="btn" style="background: #ffc107; color: #856404; border: none;">
+                        Analyze FCM Tokens
+                    </button>
+                    <div id="debugResults" style="margin-top: 16px; padding: 12px; background: #f8f9fa; border-radius: 4px; font-family: monospace; font-size: 12px; white-space: pre-wrap; display: none;"></div>
+                </div>
+
                 <div class="programs-list">
                     <h2>Current Announcements</h2>
                     <div id="announcementsList" class="loading">Loading announcements...</div>

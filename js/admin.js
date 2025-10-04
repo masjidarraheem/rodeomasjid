@@ -100,6 +100,7 @@ class AdminPanel {
         // Initialize push notifications after admin panel is loaded
         setTimeout(() => {
             this.initializePushNotifications();
+            this.setupDebugButton();
         }, 1000);
     }
 
@@ -1232,6 +1233,118 @@ class AdminPanel {
         if (infoDiv) {
             infoDiv.innerHTML = `❌ ${message}`;
             infoDiv.style.color = '#dc2626';
+        }
+    }
+
+    setupDebugButton() {
+        const debugButton = document.getElementById('debugTokens');
+        if (debugButton) {
+            debugButton.addEventListener('click', () => {
+                this.debugFCMTokens();
+            });
+        }
+    }
+
+    // Debug FCM Tokens for iOS duplication issue
+    async debugFCMTokens() {
+        const debugButton = document.getElementById('debugTokens');
+        const debugResults = document.getElementById('debugResults');
+
+        if (!debugButton || !debugResults) return;
+
+        debugButton.disabled = true;
+        debugButton.textContent = 'Analyzing...';
+        debugResults.style.display = 'block';
+        debugResults.textContent = 'Fetching FCM token data from Cloudflare Worker...\n';
+
+        try {
+            const apiKey = window.ENV?.PUSH_API_KEY;
+            if (!apiKey) {
+                throw new Error('Push API key not available');
+            }
+
+            // Call your Cloudflare Worker debug endpoint
+            const response = await fetch('https://masjid-push-notifications.rodeomasjid.workers.dev/api/debug-tokens', {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${apiKey}`,
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            if (!response.ok) {
+                throw new Error(`Debug request failed: ${response.status} ${response.statusText}`);
+            }
+
+            const debugData = await response.json();
+
+            let output = '=== FCM TOKEN ANALYSIS ===\n\n';
+            output += `Total tokens found: ${debugData.totalTokens || 0}\n\n`;
+
+            if (debugData.tokens && debugData.tokens.length > 0) {
+                // Group tokens by user patterns
+                const userGroups = {};
+                const duplicateGroups = {};
+
+                debugData.tokens.forEach(token => {
+                    const key = token.key || 'unknown';
+                    const data = token.data || {};
+
+                    // Look for potential user patterns
+                    const userAgent = data.userAgent || 'Unknown';
+                    const isIOS = userAgent.includes('iPhone') || userAgent.includes('iPad') || userAgent.includes('Safari');
+                    const isAndroid = userAgent.includes('Android');
+
+                    const platform = isIOS ? 'iOS' : (isAndroid ? 'Android' : 'Unknown');
+
+                    if (!userGroups[platform]) {
+                        userGroups[platform] = [];
+                    }
+                    userGroups[platform].push({ key, data, userAgent });
+
+                    // Check for potential duplicates (same IP, similar user agents, etc.)
+                    const fingerprint = `${data.ip || 'unknown'}_${platform}`;
+                    if (!duplicateGroups[fingerprint]) {
+                        duplicateGroups[fingerprint] = [];
+                    }
+                    duplicateGroups[fingerprint].push({ key, data, userAgent });
+                });
+
+                // Report by platform
+                Object.keys(userGroups).forEach(platform => {
+                    output += `--- ${platform} TOKENS (${userGroups[platform].length}) ---\n`;
+                    userGroups[platform].forEach((token, index) => {
+                        output += `${index + 1}. Key: ${token.key}\n`;
+                        output += `   UserAgent: ${token.userAgent.substring(0, 80)}${token.userAgent.length > 80 ? '...' : ''}\n`;
+                        output += `   Timestamp: ${token.data.timestamp || 'Unknown'}\n`;
+                        output += `   IP: ${token.data.ip || 'Unknown'}\n\n`;
+                    });
+                });
+
+                // Report potential duplicates
+                output += '\n=== POTENTIAL DUPLICATES ===\n';
+                Object.keys(duplicateGroups).forEach(fingerprint => {
+                    const group = duplicateGroups[fingerprint];
+                    if (group.length > 1) {
+                        output += `\n🔴 DUPLICATE GROUP: ${fingerprint} (${group.length} tokens)\n`;
+                        group.forEach((token, index) => {
+                            output += `  ${index + 1}. ${token.key}\n`;
+                            output += `     UA: ${token.userAgent.substring(0, 60)}...\n`;
+                        });
+                    }
+                });
+
+            } else {
+                output += 'No tokens found in storage.\n';
+            }
+
+            debugResults.textContent = output;
+
+        } catch (error) {
+            debugResults.textContent = `❌ Error analyzing tokens: ${error.message}\n\nThis might mean:\n- Debug endpoint not implemented yet\n- API key issue\n- Network connectivity problem`;
+        } finally {
+            debugButton.disabled = false;
+            debugButton.textContent = 'Analyze FCM Tokens';
         }
     }
 }
