@@ -1440,3 +1440,19 @@ const admin = new AdminPanel();
 
 // Make admin available globally for onclick events
 window.admin = admin;
+
+// Toggle Advanced Options Section
+window.toggleAdvancedOptions = function() {
+    const content = document.getElementById('advancedContent');
+    const toggle = document.getElementById('advancedToggle');
+
+    if (content && toggle) {
+        if (content.style.display === 'none') {
+            content.style.display = 'block';
+            toggle.textContent = '▲';
+        } else {
+            content.style.display = 'none';
+            toggle.textContent = '▼';
+        }
+    }
+};
