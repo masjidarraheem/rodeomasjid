@@ -1,11 +1,13 @@
 import { db } from './firebase-config.js';
-import { 
-    collection, 
-    getDocs, 
-    query, 
-    where, 
+import {
+    collection,
+    getDocs,
+    query,
+    where,
     orderBy,
-    limit
+    limit,
+    doc,
+    getDoc
 } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 
 class AnnouncementManager {
@@ -19,6 +21,8 @@ class AnnouncementManager {
 
     async init() {
         console.log('[Announcements] Initializing...');
+        this.setupServiceWorkerListener();
+        this.checkForNotificationClick();
         await this.loadActiveAnnouncement();
         this.setupEventHandlers();
         this.setupDraggable();
@@ -414,6 +418,76 @@ class AnnouncementManager {
             }
             localStorage.setItem('closedAnnouncements', JSON.stringify(closed));
         }
+    }
+
+    setupServiceWorkerListener() {
+        // Listen for messages from service worker (when notification is clicked and page is already open)
+        navigator.serviceWorker.addEventListener('message', (event) => {
+            if (event.data.type === 'SHOW_ANNOUNCEMENT') {
+                console.log('[Announcements] Received service worker message to show announcement:', event.data.announcement);
+                this.showSpecificAnnouncement(event.data.announcement);
+            }
+        });
+    }
+
+    checkForNotificationClick() {
+        // Check URL parameters for notification clicks (when notification opens new page)
+        const urlParams = new URLSearchParams(window.location.search);
+        const announcementId = urlParams.get('showAnnouncement');
+
+        if (announcementId) {
+            console.log('[Announcements] URL parameter indicates notification click for announcement:', announcementId);
+            // Remove the parameter from URL to clean it up
+            const newUrl = new URL(window.location);
+            newUrl.searchParams.delete('showAnnouncement');
+            window.history.replaceState({}, document.title, newUrl);
+
+            // Load and show the specific announcement
+            this.loadSpecificAnnouncementById(announcementId);
+        }
+    }
+
+    async loadSpecificAnnouncementById(announcementId) {
+        try {
+            const docRef = doc(db, 'announcements', announcementId);
+            const docSnap = await getDoc(docRef);
+
+            if (docSnap.exists()) {
+                const announcement = {
+                    id: docSnap.id,
+                    ...docSnap.data()
+                };
+
+                // Check if announcement is still active and not expired
+                if (announcement.isActive) {
+                    const now = new Date();
+                    if (!announcement.expiryDate ||
+                        (announcement.expiryDate.toDate ? announcement.expiryDate.toDate() : new Date(announcement.expiryDate)) > now) {
+
+                        this.showSpecificAnnouncement(announcement);
+                        return;
+                    }
+                }
+            }
+
+            console.log('[Announcements] Specific announcement not found or expired:', announcementId);
+        } catch (error) {
+            console.error('[Announcements] Error loading specific announcement:', error);
+        }
+    }
+
+    showSpecificAnnouncement(announcement) {
+        // Temporarily set this as current announcement and display it
+        const previousAnnouncement = this.currentAnnouncement;
+        this.currentAnnouncement = announcement;
+
+        // Clear any minimized state for this specific show
+        localStorage.removeItem(`announcement_${announcement.id}_minimized`);
+
+        // Display the announcement
+        this.displayAnnouncement();
+
+        console.log('[Announcements] Showing specific announcement from notification:', announcement.title);
     }
 }
 

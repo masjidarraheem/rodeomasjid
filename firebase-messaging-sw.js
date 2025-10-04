@@ -36,7 +36,7 @@ messaging.onBackgroundMessage((payload) => {
     renotify: true, // Show notification even if tag exists
     requireInteraction: false, // Don't require user interaction to dismiss
     data: {
-      click_action: payload.data?.url || 'https://masjidarraheem.github.io',
+      click_action: payload.data?.url || 'https://rodeomasjid.org',
       priority: payload.data?.priority || 'normal',
       timestamp: payload.data?.timestamp || Date.now()
     },
@@ -70,23 +70,40 @@ self.addEventListener('notificationclick', (event) => {
   }
 
   // Default action or 'view' action - open the website
-  const clickAction = event.notification.data?.click_action || 'https://masjidarraheem.github.io'
+  const clickAction = event.notification.data?.click_action || 'https://rodeomasjid.org'
+
+  // Check if this notification has announcement data
+  const announcementData = event.notification.data?.announcement
 
   event.waitUntil(
     clients.matchAll({
       type: 'window',
       includeUncontrolled: true
     }).then((clientList) => {
-      // If a window is already open, focus it
+      // If a window is already open, focus it and show the announcement
       for (const client of clientList) {
-        if (client.url.includes('masjidarraheem.github.io') && 'focus' in client) {
+        if (client.url.includes('rodeomasjid.org') && 'focus' in client) {
+          // Send message to the page to show the specific announcement
+          if (announcementData) {
+            client.postMessage({
+              type: 'SHOW_ANNOUNCEMENT',
+              announcement: announcementData
+            })
+          }
           return client.focus()
         }
       }
 
-      // If no window is open, open a new one
+      // If no window is open, open a new one with announcement parameter
       if (clients.openWindow) {
-        return clients.openWindow(clickAction)
+        let targetUrl = clickAction
+        if (announcementData) {
+          // Add announcement ID as URL parameter
+          const url = new URL(targetUrl)
+          url.searchParams.set('showAnnouncement', announcementData.id)
+          targetUrl = url.toString()
+        }
+        return clients.openWindow(targetUrl)
       }
     })
   )
